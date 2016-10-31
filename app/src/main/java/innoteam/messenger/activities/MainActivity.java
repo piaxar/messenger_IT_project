@@ -60,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
         adapter = new MyPagerAdapter(getSupportFragmentManager(), chatsFragment, messagesFragment);
         viewPager.setAdapter(adapter);
         viewPager.setPageTransformer(true, new DefaultTransformer());
-        
+
         SharedPreferences sharedPreferences = getSharedPreferences(Config.SHARED_PREF_NAME, MODE_PRIVATE);
         if (sharedPreferences.contains(Config.TOKEN_SHARED_PREF)) {
             Intent intent = new Intent(this, LoginActivity.class);

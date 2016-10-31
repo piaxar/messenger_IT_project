@@ -17,4 +17,5 @@
         android:layout_height="match_parent"
         android:layout_above="@+id/search_bar">
     </android.support.v7.widget.RecyclerView>
+
 </LinearLayout>
