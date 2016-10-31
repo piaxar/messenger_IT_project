@@ -1,7 +1,6 @@
 package innoteam.messenger.adapters;
 
 import android.content.Context;
-import android.support.v4.app.Fragment;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -61,7 +60,7 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
         TextView tvChatName = viewHolder.chatName;
         TextView tvLastMessage = viewHolder.lastMessage;
         tvChatName.setText(contact.getChatName());
-        tvLastMessage.setText(contact.getLastMessage());
+        tvLastMessage.setText(contact.getLastMessageContent());
         Log.d(TAG, "Element " + position + " set.");
     }
 

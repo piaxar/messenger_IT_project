@@ -30,7 +30,7 @@ import java.util.regex.Pattern;
 import butterknife.Bind;
 import butterknife.ButterKnife;
 import innoteam.messenger.R;
-import innoteam.messenger.adapters.Config;
+import innoteam.messenger.configs.Config;
 
 public class SignupActivity extends AppCompatActivity {
     private static final String TAG = "SignupActivity";

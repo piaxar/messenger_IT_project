@@ -1,4 +1,4 @@
-package innoteam.messenger.adapters;
+package innoteam.messenger.configs;
 
 /**
  * Created by olejeglejeg on 27.10.16.

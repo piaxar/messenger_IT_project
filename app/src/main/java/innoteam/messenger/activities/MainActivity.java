@@ -1,35 +1,19 @@
 package innoteam.messenger.activities;
 
-import android.content.Intent;
+import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-import com.ToxicBakery.viewpager.transforms.AccordionTransformer;
-import com.ToxicBakery.viewpager.transforms.BackgroundToForegroundTransformer;
-import com.ToxicBakery.viewpager.transforms.CubeInTransformer;
-import com.ToxicBakery.viewpager.transforms.CubeOutTransformer;
 import com.ToxicBakery.viewpager.transforms.DefaultTransformer;
-import com.ToxicBakery.viewpager.transforms.DepthPageTransformer;
-import com.ToxicBakery.viewpager.transforms.FlipHorizontalTransformer;
-import com.ToxicBakery.viewpager.transforms.FlipVerticalTransformer;
-import com.ToxicBakery.viewpager.transforms.ForegroundToBackgroundTransformer;
-import com.ToxicBakery.viewpager.transforms.RotateDownTransformer;
-import com.ToxicBakery.viewpager.transforms.RotateUpTransformer;
-import com.ToxicBakery.viewpager.transforms.ScaleInOutTransformer;
-import com.ToxicBakery.viewpager.transforms.StackTransformer;
-import com.ToxicBakery.viewpager.transforms.TabletTransformer;
-import com.ToxicBakery.viewpager.transforms.ZoomInTransformer;
-import com.ToxicBakery.viewpager.transforms.ZoomOutSlideTransformer;
 
 import innoteam.messenger.R;
 import innoteam.messenger.adapters.MyPagerAdapter;
-import innoteam.messenger.fragments.MessagesFragment;
 import innoteam.messenger.fragments.ChatsFragment;
+import innoteam.messenger.fragments.MessagesFragment;
 import innoteam.messenger.interfaces.OnChatSelectedListener;
+import innoteam.messenger.models.Chat;
 
 public class MainActivity extends AppCompatActivity implements OnChatSelectedListener{
 
@@ -74,14 +58,13 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
 
         return super.onOptionsItemSelected(item);
     }
-    
-    void notifyChatSelected(int chatId){
-        messagesFragment.setChat(chatId);
-    }
 
     @Override
-    public void onChatSelected(int chatId) {
-        notifyChatSelected(chatId);
+    public void onChatSelected(Chat chat) {
+
+        messagesFragment.setChat(chat);
+
+        // Switch viewPager to messages fragment
         viewPager.setCurrentItem(1);
     }
 
