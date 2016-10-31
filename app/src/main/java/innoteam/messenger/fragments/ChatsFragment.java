@@ -2,7 +2,6 @@ package innoteam.messenger.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -55,7 +54,7 @@ public class ChatsFragment extends Fragment {
             @Override
             public void onItemClick(View view, int position) {
                 // TODO send chat id instead of position
-                mListener.onChatSelected(position);
+                mListener.onChatSelected(chats.get(position));
             }
 
             @Override

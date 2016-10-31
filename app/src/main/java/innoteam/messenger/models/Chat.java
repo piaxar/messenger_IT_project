@@ -2,54 +2,45 @@ package innoteam.messenger.models;
 
 import java.util.ArrayList;
 
+import innoteam.messenger.adapters.ServerAdapter;
+
 /**
  * Created by ivan on 24.10.16.
  */
 
 public class Chat {
+    private int chatId;
     private String chatName;
-    private String lastMessage;
-    private int ChatID;
+    private int lastMessageId;
+    private ArrayList<Message> messages;
+    private Message lastMessage;
 
-    public Chat(String chatName, String lastMessage, int chatId) {
+
+    public Chat(String chatName, int lastMessageId, int chatId) {
         this.chatName = chatName;
-        this.lastMessage = lastMessage;
-        this.ChatID = chatId;
+        this.lastMessageId = lastMessageId;
+        this.chatId = chatId;
+        lastMessage = getMessageById(lastMessageId);
+    }
+
+    public ArrayList<Message> getAllMessages() {
+        messages =  ServerAdapter.INSTANCE.getChatMessages(chatId);
+        return messages;
+    }
+
+    public String getLastMessageContent(){
+        return lastMessage.getContent();
     }
 
     public String getChatName() {
         return chatName;
     }
 
-    public void setChatName(String chatName) {
-        this.chatName = chatName;
+    public int getChatId() {
+        return chatId;
     }
 
-    public String getLastMessage() {
-        return lastMessage;
+    private Message getMessageById(int messageId){
+        return ServerAdapter.INSTANCE.getMessageById(messageId);
     }
-
-    public void setLastMessage(String lastMessage) {
-        this.lastMessage = lastMessage;
-    }
-
-    public int getChatID() {
-        return ChatID;
-    }
-
-    public void setChatID(int chatID) {
-        ChatID = chatID;
-    }
-
-    public static ArrayList<Chat> createContactsList(int numContacts) {
-        ArrayList<Chat> contacts = new ArrayList<Chat>();
-
-        for (int i = 0; i <= numContacts; i++) {
-            contacts.add(new Chat("Chat number "+i,"some text", i));
-        }
-
-        return contacts;
-    }
-
-
 }

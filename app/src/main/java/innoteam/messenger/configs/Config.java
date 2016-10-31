@@ -1,4 +1,4 @@
-package innoteam.messenger.adapters;
+package innoteam.messenger.configs;
 
 import org.apache.http.HttpStatus;
 
