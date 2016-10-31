@@ -23,6 +23,7 @@ import innoteam.messenger.models.Message;
  */
 
 public class MessagesFragment extends Fragment{
+    private final String TAG = "Messages fragment";
     private ArrayList<Message> messages;
     private MessagesAdapter adapter;
     private RecyclerView rvMessages;
@@ -55,7 +56,14 @@ public class MessagesFragment extends Fragment{
     }
 
     public void setChat(Chat chat) {
-        messages = chat.getAllMessages();
+        messages.clear();
+        messages.addAll(chat.getAllMessages());
+        Log.d(TAG, "in set chat");
+        for(Message mess:chat.getAllMessages()){
+            Log.d(TAG, mess.getContent());
+        }
+
         adapter.notifyDataSetChanged();
+        Log.d(TAG,"" + adapter.getItemCount());
     }
 }

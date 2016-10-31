@@ -63,7 +63,6 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
     public void onChatSelected(Chat chat) {
 
         messagesFragment.setChat(chat);
-
         // Switch viewPager to messages fragment
         viewPager.setCurrentItem(1);
     }
