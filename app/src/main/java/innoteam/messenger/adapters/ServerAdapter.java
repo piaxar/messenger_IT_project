@@ -7,9 +7,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.json.JSONArray;
-import org.json.JSONObject;
 import org.json.JSONTokener;
-import org.json.simple.parser.JSONParser;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -31,6 +29,7 @@ public class  ServerAdapter implements SereverRequests{
 
     @Override
     public ArrayList<Chat> getAllChats() {
+        /*
         ArrayList<Integer> ids = getChatIDs();
         ArrayList<Chat> contacts = new ArrayList<Chat>();
         for (int i = 0; i < ids.size(); i++) {
@@ -59,10 +58,11 @@ public class  ServerAdapter implements SereverRequests{
                 e.printStackTrace();
             }
         }
-       /* ArrayList<Chat> contacts = new ArrayList<>();
+        */
+        ArrayList<Chat> contacts = new ArrayList<>();
         for (int i = 0; i <= 20; i++) {
             contacts.add(new Chat("Chat name", i, i));
-        }*/
+        }
         return contacts;
     }
 
@@ -99,7 +99,8 @@ public class  ServerAdapter implements SereverRequests{
 
     @Override
     public ArrayList<Message> getChatMessages(int chatID) {
-        ArrayList<Message> messages = new ArrayList<>();
+
+        ArrayList<Message> messages = new ArrayList<>(); /*
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost p = new HttpPost(Config.GET_CHAT_MESSAGES + Integer.toString(chatID));
         try {
@@ -118,7 +119,7 @@ public class  ServerAdapter implements SereverRequests{
         } catch (Exception e) {
             e.printStackTrace();
         }
-
+*/
         for (int i = 0; i < 15; i++){
             messages.add(getMessageById(i));
         }

@@ -11,8 +11,8 @@ import android.view.MenuItem;
 import com.ToxicBakery.viewpager.transforms.DefaultTransformer;
 
 import innoteam.messenger.R;
-import innoteam.messenger.configs.Config;
 import innoteam.messenger.adapters.MyPagerAdapter;
+import innoteam.messenger.configs.Config;
 import innoteam.messenger.fragments.ChatsFragment;
 import innoteam.messenger.fragments.MessagesFragment;
 import innoteam.messenger.interfaces.OnChatSelectedListener;
@@ -36,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
         adapter = new MyPagerAdapter(getSupportFragmentManager(), chatsFragment, messagesFragment);
         viewPager.setAdapter(adapter);
         viewPager.setPageTransformer(true, new DefaultTransformer());
+        //Intent intent = new Intent(this, LoginActivity.class);
+        //startActivity(intent);
 
         SharedPreferences sharedPreferences = getSharedPreferences(Config.SHARED_PREF_NAME, MODE_PRIVATE);
         if (sharedPreferences.contains(Config.TOKEN_SHARED_PREF)) {
