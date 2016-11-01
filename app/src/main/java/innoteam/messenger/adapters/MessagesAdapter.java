@@ -72,4 +72,5 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
     public int getItemCount() {
         return mMessages.size();
     }
+
 }

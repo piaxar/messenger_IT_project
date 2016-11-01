@@ -2,10 +2,12 @@ package innoteam.messenger.fragments;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,9 +26,11 @@ import innoteam.messenger.models.Chat;
  */
 
 public class ChatsFragment extends Fragment {
+    private final String TAG = "Chats fragment";
     private ArrayList<Chat> chats;
     private ChatsAdapter adapter;
     private RecyclerView rvChats;
+    private FloatingActionButton btnWriteMessage;
     LinearLayoutManager mLayoutManager;
     OnChatSelectedListener mListener;
     SearchView searchView;
@@ -46,6 +50,7 @@ public class ChatsFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
         adapter = new ChatsAdapter(chats);
         mLayoutManager = new LinearLayoutManager(getActivity());
+        btnWriteMessage = (FloatingActionButton) view.findViewById(R.id.btnAddChat);
         searchView = (SearchView) view.findViewById(R.id.search_bar);
         rvChats = (RecyclerView) view.findViewById(R.id.rvChats);
         rvChats.setAdapter(adapter);
@@ -62,7 +67,12 @@ public class ChatsFragment extends Fragment {
                 // ...
             }
         }));
-
+        btnWriteMessage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d(TAG, "On button click");
+            }
+        });
         return view;
     }
 

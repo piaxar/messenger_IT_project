@@ -55,15 +55,14 @@ public class MessagesFragment extends Fragment{
         return view;
     }
 
+    // TODO send messages
+
     public void setChat(Chat chat) {
         messages.clear();
         messages.addAll(chat.getAllMessages());
         Log.d(TAG, "in set chat");
-        for(Message mess:chat.getAllMessages()){
-            Log.d(TAG, mess.getContent());
-        }
-
         adapter.notifyDataSetChanged();
+        rvMessages.smoothScrollToPosition(adapter.getItemCount());
         Log.d(TAG,"" + adapter.getItemCount());
     }
 }

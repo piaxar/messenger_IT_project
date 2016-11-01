@@ -40,7 +40,8 @@ public class ServerAdapter implements SereverRequests{
     public Message getMessageById(int messageId) {
         // TODO also use encoder class
         Message newMessage = new Message(
-                messageId, "Sender Name", new Date(2016, 4, 12, 12, 0), "Message with id "+ messageId);
+                messageId, "Sender Name", new Date(2016, 4, 12, 12, 0), "Message with id "+ messageId+"" +
+                "wery long streeng to watch how layout is well balanced. I think that it is enough.");
         return newMessage;
     }
 
