@@ -19,6 +19,10 @@ public class Config {
 
     public static final String GET_CHAT_MESSAGES = URL + "/getchatmessages/"; //get array messages in chat  /getchatmessages/3938  // chatID
 
+    public static final String GET_MY_CHATS_MESSEGES_IDS = URL + "/getchatmessages";
+
+    public static final String GET_MESSEGE_INFO = URL + "/getmessageinfo/";
+
     public static final int LOGIN_SUCCES = HttpStatus.SC_OK;
 
     public static final int LOGIN_FAULT = HttpStatus.SC_FORBIDDEN;
@@ -30,6 +34,8 @@ public class Config {
     public static final String SHARED_PREF_NAME = "innoteamMessanger";
 
     public static final String USER_NAME_SHARED_PREF = "login";
+
+    public static final int BAD_REQUEST = HttpStatus.SC_BAD_REQUEST;
 
     public static final String PASSWORD_SHARED_PREF = "password";
 

@@ -15,7 +15,6 @@ import android.widget.Toast;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -136,6 +135,7 @@ public class SignupActivity extends AppCompatActivity {
             StrictMode.setThreadPolicy(policy);
             HttpResponse response = httpClient.execute(p);
             if (response != null) {
+                System.out.println(response.getStatusLine().getStatusCode());
                 if (response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES) {
                     Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                     startActivity(intent);

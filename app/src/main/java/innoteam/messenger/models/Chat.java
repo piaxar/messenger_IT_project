@@ -24,7 +24,7 @@ public class Chat {
     }
 
     public ArrayList<Message> getAllMessages() {
-        messages =  ServerAdapter.INSTANCE.getChatMessages(chatId);
+        //messages =  ServerAdapter.INSTANCE.getChatMessagesIdsById(chatId);
         return messages;
     }
 
@@ -41,6 +41,6 @@ public class Chat {
     }
 
     private Message getMessageById(int messageId){
-        return ServerAdapter.INSTANCE.getMessageById(messageId);
+        return ServerAdapter.INSTANCE.getMessageContentById(messageId);
     }
 }
