@@ -10,7 +10,17 @@ import innoteam.messenger.models.Message;
  */
 
 public interface SereverRequests {
+    public ArrayList<Integer> getMyChatIDs();
+
     public ArrayList<Chat> getAllChats();
-    public ArrayList<Message> getChatMessages(int chatID);
-    public Message getMessageById(int messageId);
+
+    public ArrayList<Integer> getMessagesIdsByChatId(int ChatID);
+
+    public ArrayList<Integer> getChatMessagesIdsById(int chatId);
+
+    public ArrayList<Message> getChatMesseges(int chatId);
+
+    public String getMessageContentById(int messegeId);
+
+    public Message getMessageById(int messegeId);
 }

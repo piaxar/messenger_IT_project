@@ -15,7 +15,6 @@ import android.widget.Toast;
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -136,71 +135,19 @@ public class SignupActivity extends AppCompatActivity {
             StrictMode.setThreadPolicy(policy);
             HttpResponse response = httpClient.execute(p);
             if (response != null) {
-                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                System.out.println(response.getStatusLine().getStatusCode());
+                if (response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES) {
                     Intent intent = new Intent(SignupActivity.this, LoginActivity.class);
                     startActivity(intent);
                 }
+                if (response.getStatusLine().getStatusCode() == Config.USER_NAME_ALREDY_EXISTS) {
+                    Toast.makeText(getBaseContext(), "User with this name alredy exists", Toast.LENGTH_LONG).show();
+                }
             }
-            Log.d("Status line", "" + response.getStatusLine().getStatusCode());
+           // Log.d("Status line", "" + response.getStatusLine().getStatusCode());
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-      /*  JsonObjectRequest jsonRequest = new JsonObjectRequest(Request.Method.POST, Config.REGISTER_REQUEST_URL, new JSONObject(params), new Response.Listener<JSONObject>() {
-
-            @Override
-            public void onResponse(JSONObject response) {
-                Log.d(TAG, response.toString());
-            }
-        }, new Response.ErrorListener() {
-
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                VolleyLog.d(TAG, "Error: " + error.getMessage());
-            }
-        }) {
-
-            @Override
-            public Map<String, String> getHeaders() throws AuthFailureError {
-                HashMap<String, String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/json; charset=utf-8");
-                return headers;
-            }
-        };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(SignupActivity.this);
-        requestQueue.add(jsonRequest);
-
-        /*Response.Listener<String> responseListener = new Response.Listener<String>() {
-
-            @Override
-            public void onResponse(String response) {
-                try {
-                    JSONObject jsonResponse = new JSONObject(response);
-                    boolean succes = jsonResponse.getBoolean(Config.LOGIN_SUCCES);
-                    //System.out.println(jsonResponse.toString());
-
-                    if (succes) {
-                        Intent intent = new Intent(SignupActivity.this, MainActivity.class);
-                        SignupActivity.this.startActivity(intent);
-                    }
-                    else {
-                        AlertDialog.Builder builder = new AlertDialog.Builder(SignupActivity.this);
-                        builder.setMessage("Register Faild")
-                                .setNegativeButton("Retry", null)
-                                .create()
-                                .show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        };
-    */
-      //  RegisterRequest registerRequest = new RegisterRequest(login, name, surname, password, responseListener);
-       // RequestQueue  requestQueue = Volley.newRequestQueue(SignupActivity.this);
-       // requestQueue.add(registerRequest);
-
     }
 
     public void onSignupFailed() {

@@ -1,7 +1,9 @@
 package innoteam.messenger.activities;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.support.v7.app.AppCompatActivity;
@@ -16,7 +18,6 @@ import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.http.Header;
 import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -33,7 +34,7 @@ import innoteam.messenger.configs.Config;
 
 public class LoginActivity extends AppCompatActivity {
     private static final String TAG = "LoginActivity";
-    private static final int REQUEST_SIGNUP = 0;
+    private static final int REQUEST_SIGNUP = 200;
     private static final String URL = "";
     private int mStatusCode = 0;
 
@@ -45,6 +46,7 @@ public class LoginActivity extends AppCompatActivity {
     Button _loginButton;
     @Bind(R.id.link_signup)
     TextView _signupLink;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -92,8 +94,6 @@ public class LoginActivity extends AppCompatActivity {
         final String login = _loginText.getText().toString();
         final String password = _passwordText.getText().toString();
 
-        // TODO: Implement authentication logic here.
-
         new android.os.Handler().postDelayed(
                 new Runnable() {
                     public void run() {
@@ -107,7 +107,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    @Override
+    /*@Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_SIGNUP) {
             if (resultCode == RESULT_OK) {
@@ -117,8 +117,7 @@ public class LoginActivity extends AppCompatActivity {
                 this.finish();
             }
         }
-    }
-
+    }*/
     @Override
     public void onBackPressed() {
         // Disable going back to the MainActivity
@@ -128,7 +127,6 @@ public class LoginActivity extends AppCompatActivity {
 
 
     public void onLoginSuccess(final String login, final String password) {
-        //System.out.println("kkkk2");
         _loginButton.setEnabled(true);
         String hashPassword = new String(Hex.encodeHex(DigestUtils.md5(password)));
         Map<String,String> params = new HashMap<>();
@@ -139,7 +137,7 @@ public class LoginActivity extends AppCompatActivity {
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost p = new HttpPost(Config.LOGIN_REQUEST_URL);
         JSONObject object = new JSONObject(params);
-       // System.out.println("kkkk1");
+
         try {
             p.setEntity(new StringEntity(object.toString()));
             p.setHeader("Content-type", "application/json");
@@ -147,68 +145,36 @@ public class LoginActivity extends AppCompatActivity {
             StrictMode.setThreadPolicy(policy);
             HttpResponse response = httpClient.execute(p);
             if (response != null) {
-                if (response.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+                System.out.println(response.getStatusLine().getStatusCode());
+                if (response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES) {
                     Header[] headers = response.getAllHeaders();
                     for (Header header: headers) {
+                        Log.d("Header:", header.toString() + "\n");
                         if (header.getName().equals("Authorization")) {
+                            storeData(header.getValue());
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                            intent.putExtra("authToken", header.getValue());
-                            startActivity(intent);
+                            startActivityForResult(intent, REQUEST_SIGNUP);
                         }
                     }
                 }
-                Log.d("Status line", "" + response.getStatusLine().getStatusCode());
+                if (response.getStatusLine().getStatusCode() == Config.INCORRECT_INPUT_DATA) {
+                    Toast.makeText(getBaseContext(), "Username or password is incorrect", Toast.LENGTH_LONG).show();
+                }
+                //Log.d("Status line", "" + response.getStatusLine().getStatusCode());
             }
         } catch (Exception e) {
                 e.printStackTrace();
         }
-       /* JsonObjectRequest jsonRequest = new JsonObjectRequest(Method.POST, Config.LOGIN_REQUEST_URL, new JSONObject(params), new Response.Listener<>() {
-
-            @Override
-            public void onResponse(JSONObject response) {
-
-                SharedPreferences sharedPreferences = LoginActivity.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                editor.putBoolean(Config.LOGGEDIN_SHARED_PREF, true);
-                editor.putString(Config.LOGIN_SHARED_PREF, login);
-                editor.commit();
-
-                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                //intent.putExtra("authToken", response.); //Send token
-                startActivity(intent);
-
-                Log.i("header", response.toString());
-            }
-        }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Toast.makeText(LoginActivity.this, "Invalid username or password", Toast.LENGTH_LONG).show();
-            }
-        }) {
-            @Override
-            protected Response<JSONObject> parseNetworkResponse(NetworkResponse response) {
-                Map<String, String> responseHeaders = response.headers;
-                return (Response<JSONObject>) responseHeaders;
-            }
-
-            @Override
-            public Map<String,String> getHeaders() throws AuthFailureError {
-                Map<String,String> headers = new HashMap<String, String>();
-                headers.put("Content-Type", "application/json; charset=utf-8");
-                return headers;
-            }
-        };
-
-        RequestQueue requestQueue = Volley.newRequestQueue(LoginActivity.this);
-        requestQueue.add(jsonRequest);
-*/
     }
 
-    public void storeData() {
-        String login = _loginText.getText().toString();
-        String password = _passwordText.getText().toString();
-
-
+    public void storeData(String token) {
+        SharedPreferences sharedPreferences = LoginActivity.this.getSharedPreferences(Config.SHARED_PREF_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(Config.USER_NAME_SHARED_PREF, _loginText.getText().toString());
+        editor.putString(Config.PASSWORD_SHARED_PREF, _passwordText.getText().toString());
+        editor.putString(Config.TOKEN_SHARED_PREF, token);
+        Config.TOKEN = token;
+        editor.commit();
     }
 
     public void onLoginFailed() {
