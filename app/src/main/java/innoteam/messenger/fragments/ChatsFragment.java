@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -17,6 +18,7 @@ import java.util.ArrayList;
 import innoteam.messenger.R;
 import innoteam.messenger.adapters.ChatsAdapter;
 import innoteam.messenger.adapters.ServerAdapter;
+import innoteam.messenger.behaviors.SimpleDividerItemDecoration;
 import innoteam.messenger.interfaces.OnChatSelectedListener;
 import innoteam.messenger.listeners.RecyclerItemClickListener;
 import innoteam.messenger.models.Chat;
@@ -31,6 +33,7 @@ public class ChatsFragment extends Fragment {
     private ChatsAdapter adapter;
     private RecyclerView rvChats;
     private FloatingActionButton btnWriteMessage;
+    private SwipeRefreshLayout swipeRefreshLayout;
     LinearLayoutManager mLayoutManager;
     OnChatSelectedListener mListener;
     SearchView searchView;
@@ -53,12 +56,15 @@ public class ChatsFragment extends Fragment {
         btnWriteMessage = (FloatingActionButton) view.findViewById(R.id.btnAddChat);
         searchView = (SearchView) view.findViewById(R.id.search_bar);
         rvChats = (RecyclerView) view.findViewById(R.id.rvChats);
+        swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
         rvChats.setAdapter(adapter);
+        rvChats.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
         rvChats.setLayoutManager(mLayoutManager);
         rvChats.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), rvChats, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
                 // TODO send chat id instead of position
+                // but seems to be alright
                 mListener.onChatSelected(chats.get(position));
             }
 
@@ -71,6 +77,15 @@ public class ChatsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 Log.d(TAG, "On button click");
+            }
+        });
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // TODO add refresher
+                Log.d(TAG, "Refreshed");
+                swipeRefreshLayout.setRefreshing(false);
+
             }
         });
         return view;

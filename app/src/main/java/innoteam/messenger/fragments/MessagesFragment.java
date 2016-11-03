@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -28,6 +29,7 @@ public class MessagesFragment extends Fragment{
     private MessagesAdapter adapter;
     private RecyclerView rvMessages;
     private LinearLayoutManager mLayoutManager;
+    private TextView chatName;
 
 
     @Override
@@ -36,6 +38,7 @@ public class MessagesFragment extends Fragment{
         messages = new ArrayList<>();
         adapter = new MessagesAdapter(messages);
         mLayoutManager = new LinearLayoutManager(getActivity());
+        chatName = (TextView) view.findViewById(R.id.tvChatName);
         rvMessages = (RecyclerView) view.findViewById(R.id.rvMessages);
         rvMessages.setAdapter(adapter);
         rvMessages.setLayoutManager(mLayoutManager);
@@ -58,6 +61,7 @@ public class MessagesFragment extends Fragment{
     // TODO send messages
 
     public void setChat(Chat chat) {
+        chatName.setText(chat.getChatName());
         messages.clear();
         messages.addAll(chat.getAllMessages());
         Log.d(TAG, "in set chat");
