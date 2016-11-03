@@ -47,6 +47,7 @@ public class LoginActivity extends AppCompatActivity {
     @Bind(R.id.link_signup)
     TextView _signupLink;
 
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -144,9 +145,11 @@ public class LoginActivity extends AppCompatActivity {
             StrictMode.setThreadPolicy(policy);
             HttpResponse response = httpClient.execute(p);
             if (response != null) {
+                System.out.println(response.getStatusLine().getStatusCode());
                 if (response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES) {
                     Header[] headers = response.getAllHeaders();
                     for (Header header: headers) {
+                        Log.d("Header:", header.toString() + "\n");
                         if (header.getName().equals("Authorization")) {
                             storeData(header.getValue());
                             Intent intent = new Intent(LoginActivity.this, MainActivity.class);

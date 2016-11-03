@@ -17,6 +17,7 @@ import innoteam.messenger.fragments.ChatsFragment;
 import innoteam.messenger.fragments.MessagesFragment;
 import innoteam.messenger.interfaces.OnChatSelectedListener;
 import innoteam.messenger.models.Chat;
+import innoteam.messenger.network.NetworkHelper;
 
 public class MainActivity extends AppCompatActivity implements OnChatSelectedListener{
     private static final int REQUEST_SIGNUP = 200;
@@ -36,14 +37,21 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
         adapter = new MyPagerAdapter(getSupportFragmentManager(), chatsFragment, messagesFragment);
         viewPager.setAdapter(adapter);
         viewPager.setPageTransformer(true, new DefaultTransformer());
-        //Intent intent = new Intent(this, LoginActivity.class);
-        //startActivity(intent);
-
         SharedPreferences sharedPreferences = getSharedPreferences(Config.SHARED_PREF_NAME, MODE_PRIVATE);
-        if (sharedPreferences.contains(Config.TOKEN_SHARED_PREF)) {
+
+        if (sharedPreferences.contains(Config.TOKEN_SHARED_PREF) == false) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);
         }
+        else {
+            NetworkHelper networkHelper = new NetworkHelper();
+
+
+            if (!networkHelper.isTokenFresh(this)){
+                networkHelper.tokenRefresher(this);
+            }
+        }
+        //System.out.println(ServerAdapter.INSTANCE.getChatMessagesIdsById(2));
     }
 
     @Override

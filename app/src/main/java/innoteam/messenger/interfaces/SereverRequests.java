@@ -1,7 +1,5 @@
 package innoteam.messenger.interfaces;
 
-import android.content.Intent;
-
 import java.util.ArrayList;
 
 import innoteam.messenger.models.Chat;
@@ -12,8 +10,17 @@ import innoteam.messenger.models.Message;
  */
 
 public interface SereverRequests {
+    public ArrayList<Integer> getMyChatIDs();
+
     public ArrayList<Chat> getAllChats();
-    public ArrayList<Message> getChatMessages(int chatID);
-    public ArrayList<Integer> getChatIDs();
-    public Message getMessageById(int messageId);
+
+    public ArrayList<Integer> getChatMessegesIds(int ChatID);
+
+    public ArrayList<Integer> getChatMessagesIdsById(int chatId);
+
+    public ArrayList<Message> getChatMesseges(int chatId);
+
+    public Message getMessageContentById(int messegeId);
+
+    public Message getMessegeInfo(int messegeId);
 }
