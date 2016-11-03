@@ -14,13 +14,13 @@ public interface SereverRequests {
 
     public ArrayList<Chat> getAllChats();
 
-    public ArrayList<Integer> getChatMessegesIds(int ChatID);
+    public ArrayList<Integer> getMessagesIdsByChatId(int ChatID);
 
     public ArrayList<Integer> getChatMessagesIdsById(int chatId);
 
     public ArrayList<Message> getChatMesseges(int chatId);
 
-    public Message getMessageContentById(int messegeId);
+    public String getMessageContentById(int messegeId);
 
-    public Message getMessegeInfo(int messegeId);
+    public Message getMessageById(int messegeId);
 }

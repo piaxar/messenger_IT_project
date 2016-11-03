@@ -1,5 +1,7 @@
 package innoteam.messenger.models;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 
 import innoteam.messenger.adapters.ServerAdapter;
@@ -14,6 +16,7 @@ public class Chat {
     private int lastMessageId;
     private ArrayList<Message> messages;
     private Message lastMessage;
+    private final String TAG = "Chat model";
 
 
     public Chat(String chatName, int lastMessageId, int chatId) {
@@ -24,7 +27,12 @@ public class Chat {
     }
 
     public ArrayList<Message> getAllMessages() {
-        //messages =  ServerAdapter.INSTANCE.getChatMessagesIdsById(chatId);
+        Log.d(TAG, "Getting all messages to chat");
+        messages =  ServerAdapter.INSTANCE.getChatMessagesById(chatId);
+        for (Message msg: messages){
+            Log.d(TAG, "Get message with content: "+ msg.getContent());
+        }
+        Log.d(TAG, "Finish getting");
         return messages;
     }
 
@@ -41,6 +49,6 @@ public class Chat {
     }
 
     private Message getMessageById(int messageId){
-        return ServerAdapter.INSTANCE.getMessageContentById(messageId);
+        return ServerAdapter.INSTANCE.getMessageById(messageId);
     }
 }

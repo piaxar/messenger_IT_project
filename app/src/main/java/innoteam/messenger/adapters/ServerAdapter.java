@@ -3,6 +3,7 @@ package innoteam.messenger.adapters;
 import android.os.StrictMode;
 import android.util.Log;
 
+import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
@@ -13,6 +14,7 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayOutputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,12 +29,12 @@ import innoteam.messenger.models.Message;
  */
 
 public class  ServerAdapter implements SereverRequests{
+    private final String TAG = "ServerAdapter";
 
     public static final ServerAdapter INSTANCE = new ServerAdapter();
 
     @Override
     public ArrayList<Chat> getAllChats() {
-        // /gethatinfo
         ArrayList<Integer> ids = getMyChatIDs();
         ArrayList<Chat> contacts = new ArrayList<Chat>();
         for (int i = 0; i < ids.size(); i++) {
@@ -53,7 +55,7 @@ public class  ServerAdapter implements SereverRequests{
                         String name = jsonObj.getString("name");
                         int chatId = jsonObj.getInt("chatId");
                         int lastMessageId = jsonObj.getInt("lastMessageId");
-                        //System.out.println(name + " " + chatId + " " + lastMessageId);
+                        Log.d(TAG, "Chat added: chat name: "+name + " chatId: " + chatId + " lastMessageId: " + lastMessageId);
                         contacts.add(new Chat(name, lastMessageId, chatId));
                     }
                 }
@@ -61,14 +63,8 @@ public class  ServerAdapter implements SereverRequests{
                 e.printStackTrace();
             }
         }
-        /*
-        ArrayList<Chat> contacts2 = new ArrayList<>();
-        for (int i = 0; i <= 20; i++) {
-            contacts2.add(new Chat("Chat name", i, i));
-        }*/
         return contacts;
     }
-
 
     @Override
     public ArrayList<Integer> getMyChatIDs() {
@@ -97,13 +93,12 @@ public class  ServerAdapter implements SereverRequests{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        //System.out.println(ids);
+        System.out.println(ids);
         return ids;
     }
 
-
     @Override
-    public ArrayList<Integer> getChatMessegesIds(int chatID) {
+    public ArrayList<Integer> getMessagesIdsByChatId(int chatID) {
         ArrayList<Integer> messegesIDs = new ArrayList<Integer>();
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost p = new HttpPost(Config.GET_MY_CHATS_MESSEGES_IDS + String.valueOf(chatID));
@@ -112,10 +107,12 @@ public class  ServerAdapter implements SereverRequests{
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
             HttpResponse response = httpClient.execute(p);
+            System.out.println(response.getStatusLine().getStatusCode());
             if (response != null) {
                 if (response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES) {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
                     String json = reader.readLine();
+                    System.out.println(json);
                     JSONTokener tokener = new JSONTokener(json);
                     JSONArray allMesseges = new JSONArray(tokener);
                     if (allMesseges != null) {
@@ -131,6 +128,20 @@ public class  ServerAdapter implements SereverRequests{
         return messegesIDs;
     }
 
+    public ArrayList<Message> getChatMessagesById(int chatId){
+        Log.d(TAG, "Start getChatMessagesById");
+        ArrayList<Message> messages = new ArrayList<Message>();
+        ArrayList<Integer> arr = getMessagesIdsByChatId(chatId);
+        System.out.println(arr);
+        for (Integer messageId: arr){
+            Log.d(TAG, "message ID: " + messageId);
+            Message message = getMessageById(messageId);
+            messages.add(message);
+            Log.d(TAG, "in getChatMessagesById, get message with content: "+ message.getContent());
+        }
+        Log.d(TAG, "Finish getChatMessagesById");
+        return messages;
+    }
 
     @Override
     public ArrayList<Integer> getChatMessagesIdsById(int chatId) {
@@ -192,9 +203,7 @@ public class  ServerAdapter implements SereverRequests{
                         int sentChatId = jsonObj.getInt("chatId");
                         String fromUSerName = jsonObj.getString("fromUSerId");
                         long sendTime = jsonObj.getLong("sentTime");
-                        //System.out.println(name + " " + chatId + " " + lastMessageId);
-                        Message messege = getMessageContentById(messageId); // Incorrect, may be tranfer ids to getMessegeById and here create ArrayList<Messenge> ???
-                        messeges.add(new Message(messageId, fromUSerName, new Date(sendTime * 1000), messege.getContent()));
+                        messeges.add(new Message(messageId, fromUSerName, new Date(sendTime * 1000),getMessageContentById(messageId)));
                     }
                 }
             } catch (Exception e) {
@@ -205,17 +214,32 @@ public class  ServerAdapter implements SereverRequests{
     }
 
     @Override
-    public Message getMessageContentById(int messageId) {
-        // TODO also use encoder class
-
-        Message newMessage = new Message(
-                messageId, "Sender Name", new Date(2016, 4, 12, 12, 0), "Message with id "+ messageId+"" +
-                "wery long streeng to watch how layout is well balanced. I think that it is enough.");
-        return newMessage;
+    public String getMessageContentById(int messageId) {
+        String res = null;
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost p = new HttpPost(Config.GET_MESSEGE_CONTENT + String.valueOf(messageId));
+        try {
+            p.setHeader("Authorization", Config.TOKEN);
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            HttpResponse response = httpClient.execute(p);
+            if (response != null) {
+                if (response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES) {
+                    HttpEntity entity = response.getEntity();
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    entity.writeTo(baos);
+                    res = baos.toByteArray().toString();
+                    System.out.println(baos.toByteArray().toString());
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return res;
     }
 
     @Override
-    public Message getMessegeInfo(int messegeId) {
+    public Message getMessageById(int messegeId) {
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost p = new HttpPost(Config.GET_MESSEGE_INFO + String.valueOf(messegeId));
         Message newMessege = null;
@@ -233,7 +257,7 @@ public class  ServerAdapter implements SereverRequests{
                     int fromUserId = jsonObj.getInt("fromUserId");
                     String fromUserName = jsonObj.getString("fromUserName");
                     long sendTime = jsonObj.getLong("sentTime");
-                    newMessege = new Message(sentmessegeId, fromUserName, new Date(sendTime * 1000), getMessageContentById(messegeId).toString()); ///!!!!
+                    newMessege = new Message(sentmessegeId, fromUserName, new Date(sendTime), getMessageContentById(messegeId));
                 }
             }
         } catch(Exception e) {
