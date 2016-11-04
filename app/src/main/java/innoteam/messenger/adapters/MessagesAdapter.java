@@ -8,6 +8,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.List;
 
 import innoteam.messenger.R;
@@ -64,7 +66,9 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
 
         tvSenderName.setText(message.getSenderName());
         tvMessageContent.setText(message.getContent());
-        tvMessageTime.setText(message.getSendTime().toString());
+        Calendar calendar = GregorianCalendar.getInstance();
+        calendar.setTime(message.getSendTime());
+        tvMessageTime.setText(calendar.get(Calendar.HOUR) +":"+ calendar.get(calendar.MINUTE));
         Log.d(TAG, "Element " + position + " set.");
     }
 

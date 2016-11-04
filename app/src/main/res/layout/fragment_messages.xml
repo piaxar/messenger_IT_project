@@ -3,6 +3,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/windowBackground"
     android:weightSum="1">
 
     <TextView
@@ -10,12 +11,12 @@
         android:layout_width="match_parent"
         android:gravity="left|center"
         android:text="Chat name"
-        android:textColor="@color/colorPrimaryText"
-        android:background="@color/colorAccent"
-        android:textSize="25sp"
-        android:layout_height="45dp"
+        android:textColor="@color/textColorPrimaryLight"
+        android:background="@color/colorPrimary"
+        android:textSize="@dimen/textSizeHeader"
+        android:layout_height="@dimen/heightToolbar"
         android:fontFamily="sans-serif"
-        android:paddingLeft="16dp" />
+        android:paddingLeft="72dp" />
 
 
     <android.support.v7.widget.RecyclerView
@@ -28,7 +29,7 @@
         android:id="@+id/relativeLayout"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:background="@color/colorAccent"
+        android:background="@color/colorPrimary"
         android:layout_height="45dp">
 
         <EditText
@@ -41,18 +42,20 @@
             android:hint="Your message here"
             android:layout_alignParentBottom="true"
             android:layout_alignParentTop="true"
-            android:textColorHint="@color/colorSecondaryText"
-            android:textColor="@color/colorPrimaryText"/>
+            android:textColorHint="@color/textColorHintLight"
+            android:textColor="@color/textColorPrimaryLight"/>
 
         <Button
             android:id="@+id/btnSendMessage"
             android:layout_width="96dp"
             android:layout_height="wrap_content"
+            android:layout_margin="3dp"
             android:layout_alignParentBottom="true"
             android:text="Send"
             android:layout_alignParentRight="true"
             android:layout_alignParentTop="true"
-            android:textColor="@color/colorAccent"/>
+            android:textColor="@color/textColorPrimaryLight"
+            android:background="@drawable/button"/>
 
     </RelativeLayout>
 </LinearLayout>

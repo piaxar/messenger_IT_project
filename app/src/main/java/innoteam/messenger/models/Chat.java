@@ -26,6 +26,16 @@ public class Chat {
         lastMessage = getMessageById(lastMessageId);
     }
 
+    public Chat(String chatName, int chatId){
+        this.chatName = chatName;
+        this.chatId = chatId;
+    }
+
+    public void setLastMessageId(int lastMessageId){
+        this.lastMessageId = lastMessageId;
+        lastMessage = getMessageById(lastMessageId);
+    }
+
     public ArrayList<Message> getAllMessages() {
         Log.d(TAG, "Getting all messages to chat");
         messages =  ServerAdapter.INSTANCE.getChatMessagesById(chatId);

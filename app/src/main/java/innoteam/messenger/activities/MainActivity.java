@@ -8,7 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.ToxicBakery.viewpager.transforms.CubeOutTransformer;
+import com.ToxicBakery.viewpager.transforms.DepthPageTransformer;
 
 import innoteam.messenger.R;
 import innoteam.messenger.adapters.MyPagerAdapter;
@@ -36,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
         messagesFragment = new MessagesFragment();
         adapter = new MyPagerAdapter(getSupportFragmentManager(), chatsFragment, messagesFragment);
         viewPager.setAdapter(adapter);
-        viewPager.setPageTransformer(true, new CubeOutTransformer());
+        viewPager.setPageTransformer(true, new DepthPageTransformer());
         SharedPreferences sharedPreferences = getSharedPreferences(Config.SHARED_PREF_NAME, MODE_PRIVATE);
 
         if (sharedPreferences.contains(Config.TOKEN_SHARED_PREF) == false) {
