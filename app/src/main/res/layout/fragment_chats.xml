@@ -7,14 +7,13 @@
 
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="45dp"
-        android:background="@color/colorAccent"
-        android:fontFamily="sans-serif"
+        android:layout_height="@dimen/heightToolbar"
+        android:background="@color/colorPrimary"
         android:gravity="left|center"
-        android:paddingLeft="16dp"
+        android:paddingLeft="72dp"
         android:text="Messenger"
-        android:textColor="@color/colorPrimaryText"
-        android:textSize="25sp" />
+        android:textColor="@color/textColorPrimaryLight"
+        android:textSize="@dimen/textSizeHeader" />
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"
@@ -41,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|right"
             android:layout_margin="16dp"
-            android:src="@drawable/ic_create_black_24dp"
+            android:src="@drawable/email_white"
             app:backgroundTint="@color/colorAccent"
             app:layout_anchor="@id/rvChats"
             app:layout_anchorGravity="bottom|right|end"
