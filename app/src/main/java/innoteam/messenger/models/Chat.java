@@ -17,6 +17,7 @@ public class Chat {
     private ArrayList<Message> messages;
     private Message lastMessage;
     private final String TAG = "Chat model";
+    private boolean isLastMessageSet;
 
 
     public Chat(String chatName, int lastMessageId, int chatId) {
@@ -24,6 +25,19 @@ public class Chat {
         this.lastMessageId = lastMessageId;
         this.chatId = chatId;
         lastMessage = getMessageById(lastMessageId);
+        isLastMessageSet = true;
+    }
+
+    public Chat(String chatName, int chatId){
+        this.chatName = chatName;
+        this.chatId = chatId;
+        isLastMessageSet = false;
+    }
+
+    public void setLastMessageId(int lastMessageId){
+        this.lastMessageId = lastMessageId;
+        lastMessage = getMessageById(lastMessageId);
+        isLastMessageSet = true;
     }
 
     public ArrayList<Message> getAllMessages() {
@@ -37,7 +51,9 @@ public class Chat {
     }
 
     public String getLastMessageContent(){
-        return lastMessage.getContent();
+        if (isLastMessageSet)
+            return lastMessage.getContent();
+        else return "";
     }
 
     public String getChatName() {
