@@ -19,11 +19,17 @@ public class Config {
 
     public static final String GET_CHAT_MESSAGES = URL + "/getchatmessages/"; //get array messages in chat  /getchatmessages/3938  // chatID
 
-    public static final String GET_MY_CHATS_MESSEGES_IDS = URL + "/getchatmessages/";
+    public static final String GET_MY_CHATS_MESSAGES_IDS = URL + "/getchatmessages/";
 
-    public static final String GET_MESSEGE_INFO = URL + "/getmessageinfo/";
+    public static final String GET_MESSAGE_INFO = URL + "/getmessageinfo/";
 
-    public static final String GET_MESSEGE_CONTENT = URL + "/getmessagecontent/";
+    public static final String GET_MESSAGE_CONTENT = URL + "/getmessagecontent/";
+
+    public static final String SEND_MESSAGE = URL + "/sendmessage/";
+
+    public static final String CREATE_NEW_PRIVATE_CHAT = URL + "/newprivatechat/";
+
+    public static final String GET_CHAT_USERS = URL + "/getchatusers/";
 
     public static final int LOGIN_SUCCES = HttpStatus.SC_OK;
 

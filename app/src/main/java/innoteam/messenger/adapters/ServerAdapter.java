@@ -3,10 +3,10 @@ package innoteam.messenger.adapters;
 import android.os.StrictMode;
 import android.util.Log;
 
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
@@ -14,8 +14,10 @@ import org.json.JSONObject;
 import org.json.JSONTokener;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -23,6 +25,7 @@ import innoteam.messenger.configs.Config;
 import innoteam.messenger.interfaces.SereverRequests;
 import innoteam.messenger.models.Chat;
 import innoteam.messenger.models.Message;
+import innoteam.messenger.models.User;
 
 /**
  * Created by ivan on 25.10.16.
@@ -54,9 +57,16 @@ public class  ServerAdapter implements SereverRequests{
                         JSONObject jsonObj = new JSONObject(json);
                         String name = jsonObj.getString("name");
                         int chatId = jsonObj.getInt("chatId");
-                        int lastMessageId = jsonObj.getInt("lastMessageId");
-                        Log.d(TAG, "Chat added: chat name: "+name + " chatId: " + chatId + " lastMessageId: " + lastMessageId);
-                        contacts.add(new Chat(name, lastMessageId, chatId));
+                        if (jsonObj.isNull("lastMessageId")) {
+                            Log.d(TAG, "Chat added: chat name: " + name + " chatId: " + chatId);
+                            contacts.add(new Chat(name, chatId));
+
+                        }
+                        else {
+                            int lastMessageId = jsonObj.getInt("lastMessageId");
+                            Log.d(TAG, "Chat added: chat name: " + name + " chatId: " + chatId + " lastMessageId: " + lastMessageId);
+                            contacts.add(new Chat(name, lastMessageId, chatId));
+                        }
                     }
                 }
             } catch (Exception e) {
@@ -93,7 +103,7 @@ public class  ServerAdapter implements SereverRequests{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        System.out.println(ids);
+       // System.out.println(ids);
         return ids;
     }
 
@@ -101,7 +111,7 @@ public class  ServerAdapter implements SereverRequests{
     public ArrayList<Integer> getMessagesIdsByChatId(int chatID) {
         ArrayList<Integer> messegesIDs = new ArrayList<Integer>();
         HttpClient httpClient = new DefaultHttpClient();
-        HttpPost p = new HttpPost(Config.GET_MY_CHATS_MESSEGES_IDS + String.valueOf(chatID));
+        HttpPost p = new HttpPost(Config.GET_MY_CHATS_MESSAGES_IDS + String.valueOf(chatID));
         try {
             p.setHeader("Authorization", Config.TOKEN);
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
@@ -112,7 +122,7 @@ public class  ServerAdapter implements SereverRequests{
                 if (response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES) {
                     BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
                     String json = reader.readLine();
-                    System.out.println(json);
+                    //System.out.println(json);
                     JSONTokener tokener = new JSONTokener(json);
                     JSONArray allMesseges = new JSONArray(tokener);
                     if (allMesseges != null) {
@@ -132,7 +142,7 @@ public class  ServerAdapter implements SereverRequests{
         Log.d(TAG, "Start getChatMessagesById");
         ArrayList<Message> messages = new ArrayList<Message>();
         ArrayList<Integer> arr = getMessagesIdsByChatId(chatId);
-        System.out.println(arr);
+        //System.out.println(arr);
         for (Integer messageId: arr){
             Log.d(TAG, "message ID: " + messageId);
             Message message = getMessageById(messageId);
@@ -161,7 +171,6 @@ public class  ServerAdapter implements SereverRequests{
                     String json = reader.readLine();
                     JSONTokener tokener = new JSONTokener(json);
                     JSONArray allMesseges = new JSONArray(tokener);
-                    //Log.i("Get Chat Messages by Id", "here");
                     if (allMesseges != null) {
                         for (int i = 0; i <allMesseges.length(); i++){
                             messageIds.add((int) allMesseges.get(i));
@@ -172,11 +181,36 @@ public class  ServerAdapter implements SereverRequests{
         } catch (Exception e) {
             e.printStackTrace();
         }
- /*
-        for (int i = 0; i < 15; i++){
-            messages.add(getMessageById(i));
+
+        return messageIds;
+    }
+
+    public ArrayList<Integer> getChatMessagesIdsByIdsFromCurentId(int chatId, int startMessageId) {
+        ArrayList<Integer> messageIds = new ArrayList<>();
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost p = new HttpPost(Config.GET_CHAT_MESSAGES + Integer.toString(chatId) + "/" + Integer.toString(startMessageId));
+        try {
+            p.setHeader("Authorization", Config.TOKEN);
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            HttpResponse response = httpClient.execute(p);
+            if (response != null) {
+                if (response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES) {
+                    BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent(), "UTF-8"));
+                    String json = reader.readLine();
+                    JSONTokener tokener = new JSONTokener(json);
+                    JSONArray allMesseges = new JSONArray(tokener);
+                    if (allMesseges != null) {
+                        for (int i = 0; i <allMesseges.length(); i++){
+                            messageIds.add((int) allMesseges.get(i));
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    */
+
         return messageIds;
     }
 
@@ -201,7 +235,8 @@ public class  ServerAdapter implements SereverRequests{
                         JSONObject jsonObj = new JSONObject(json);
                         int messageId = jsonObj.getInt("messageId");
                         int sentChatId = jsonObj.getInt("chatId");
-                        String fromUSerName = jsonObj.getString("fromUSerId");
+                        int fromUserId = jsonObj.getInt("fromUserId");
+                        String fromUSerName = jsonObj.getString("fromUserName");
                         long sendTime = jsonObj.getLong("sentTime");
                         messeges.add(new Message(messageId, fromUSerName, new Date(sendTime * 1000),getMessageContentById(messageId)));
                     }
@@ -217,19 +252,17 @@ public class  ServerAdapter implements SereverRequests{
     public String getMessageContentById(int messageId) {
         String res = null;
         HttpClient httpClient = new DefaultHttpClient();
-        HttpPost p = new HttpPost(Config.GET_MESSEGE_CONTENT + String.valueOf(messageId));
+        HttpPost p = new HttpPost(Config.GET_MESSAGE_CONTENT + String.valueOf(messageId));
         try {
             p.setHeader("Authorization", Config.TOKEN);
             StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
             StrictMode.setThreadPolicy(policy);
             HttpResponse response = httpClient.execute(p);
             if (response != null) {
+                Log.i(TAG, "getMessageContent By Id: Response code:" + String.valueOf(response.getStatusLine().getStatusCode()));
                 if (response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES) {
-                    HttpEntity entity = response.getEntity();
-                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    entity.writeTo(baos);
-                    res = baos.toByteArray().toString();
-                    System.out.println(baos.toByteArray().toString());
+                    byte[] content = EntityUtils.toByteArray(response.getEntity());
+                    res = new String(content, "UTF-8");
                 }
             }
         } catch (Exception e) {
@@ -241,7 +274,7 @@ public class  ServerAdapter implements SereverRequests{
     @Override
     public Message getMessageById(int messegeId) {
         HttpClient httpClient = new DefaultHttpClient();
-        HttpPost p = new HttpPost(Config.GET_MESSEGE_INFO + String.valueOf(messegeId));
+        HttpPost p = new HttpPost(Config.GET_MESSAGE_INFO + String.valueOf(messegeId));
         Message newMessege = null;
         try {
             p.setHeader("Authorization", Config.TOKEN);
@@ -263,8 +296,69 @@ public class  ServerAdapter implements SereverRequests{
         } catch(Exception e) {
             e.printStackTrace();
         }
+
         return newMessege;
     }
 
+    public void sendMessage(int chatId, String message) {
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost p = new HttpPost(Config.SEND_MESSAGE + String.valueOf(chatId));
+        InputStream stream = new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8));
+        try {
+            p.setEntity(new InputStreamEntity(stream, message.length()));
+            p.addHeader("Authorization", Config.TOKEN);
+            p.addHeader("Content-Type", "application/octet-stream");
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            HttpResponse response = httpClient.execute(p);
+            if (!(response != null || response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES)){
+                Log.i(TAG, "Message not sent");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
 
+    public void createNewPrivateChat(String userLogin) {
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost p = new HttpPost(Config.CREATE_NEW_PRIVATE_CHAT + userLogin);
+        try {
+            p.setHeader("Authorization", Config.TOKEN);
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            HttpResponse response = httpClient.execute(p);
+            if (!(response != null || response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES)){
+                Log.i(TAG, "Chat not created");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ArrayList<User> getAllUsers(int chatId){
+        ArrayList<User> users = new ArrayList<User>();
+        HttpClient httpClient = new DefaultHttpClient();
+        HttpPost p = new HttpPost(Config.GET_CHAT_USERS + String.valueOf(chatId));
+        try {
+            p.setHeader("Authorization", Config.TOKEN);
+            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+            StrictMode.setThreadPolicy(policy);
+            HttpResponse response = httpClient.execute(p);
+            if (response != null && response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES) {
+                String json = EntityUtils.toString(response.getEntity(), "UTF-8");
+                JSONArray jsonArray = new JSONArray(json);
+                for (int i = 0; i < jsonArray.length(); i++) {
+                    JSONObject data = jsonArray.getJSONObject(i);
+                    int userId = data.getInt("id");
+                    String userLogin = data.getString("login");
+                    String fullName = data.getString("fullName");
+                    Log.i(TAG, "id: " + String.valueOf(userId) + " " + "userLogin: " + userLogin + " " + "fullname: " + fullName + "\n");
+                    users.add(new User(userId, userLogin, fullName));
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return users;
+    }
 }
