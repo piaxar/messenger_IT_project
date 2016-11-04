@@ -69,5 +69,16 @@ public class ChatsAdapter extends RecyclerView.Adapter<ChatsAdapter.ViewHolder> 
     public int getItemCount() {
         return mChats.size();
     }
+    // Clean all elements of the recycler
 
+    public void clear() {
+        mChats.clear();
+        notifyDataSetChanged();
+    }
+
+
+    public void addAll(List<Chat> list) {
+        mChats.addAll(list);
+        notifyDataSetChanged();
+    }
 }

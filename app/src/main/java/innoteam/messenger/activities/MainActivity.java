@@ -8,10 +8,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
 
-import com.ToxicBakery.viewpager.transforms.DefaultTransformer;
+import com.ToxicBakery.viewpager.transforms.DepthPageTransformer;
 
 import innoteam.messenger.R;
 import innoteam.messenger.adapters.MyPagerAdapter;
+import innoteam.messenger.adapters.ServerAdapter;
 import innoteam.messenger.configs.Config;
 import innoteam.messenger.fragments.ChatsFragment;
 import innoteam.messenger.fragments.MessagesFragment;
@@ -26,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
     MessagesFragment messagesFragment;
     ChatsFragment chatsFragment;
     ViewPager viewPager;
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -36,8 +38,8 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
         messagesFragment = new MessagesFragment();
         adapter = new MyPagerAdapter(getSupportFragmentManager(), chatsFragment, messagesFragment);
         viewPager.setAdapter(adapter);
-        viewPager.setPageTransformer(true, new DefaultTransformer());
-        SharedPreferences sharedPreferences = getSharedPreferences(Config.SHARED_PREF_NAME, MODE_PRIVATE);
+        viewPager.setPageTransformer(true, new DepthPageTransformer());
+        sharedPreferences = getSharedPreferences(Config.SHARED_PREF_NAME, MODE_PRIVATE);
 
         if (sharedPreferences.contains(Config.TOKEN_SHARED_PREF) == false) {
             Intent intent = new Intent(this, LoginActivity.class);
@@ -51,7 +53,7 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
                 networkHelper.tokenRefresher(this);
             }
         }
-        //System.out.println(ServerAdapter.INSTANCE.getChatMessagesIdsById(2));
+        ServerAdapter.INSTANCE.getAllUsers(4);
     }
 
     @Override
@@ -87,6 +89,11 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
         messagesFragment.setChat(chat);
         // Switch viewPager to messages fragment
         viewPager.setCurrentItem(1);
+    }
+
+    @Override
+    public void onLogOut() {
+        sharedPreferences.edit().clear().commit();
     }
 
     @Override

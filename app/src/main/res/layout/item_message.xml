@@ -2,26 +2,54 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:layout_marginLeft="32dp"
+    android:layout_marginTop="2dp"
+    android:layout_marginRight="2dp"
+
+
+    >
 
     <TextView
         android:id="@+id/tvUserName"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Oleg Taizov"
-        android:padding="16dp"/>
-
-    <TextView
-        android:id="@+id/tvMessage"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Hello" />
-
-    <TextView
-        android:id="@+id/tvMessageTime"
         android:layout_width="wrap_content"
+        android:layout_height="@dimen/heightListItemHalf"
+        android:gravity="bottom|left"
+        android:text="Oleg Taizov"
+        android:textSize="@dimen/textSizeSubHeader"
+        android:textColor="@color/textColorPrimary"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="right"
-        android:text="21:20"
-        android:padding="5dp"/>
+        android:orientation="horizontal"
+        android:weightSum="1">
+
+        <TextView
+            android:id="@+id/tvMessage"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/textColorSecondary"
+            android:layout_gravity="top|left"
+            android:text="Hello"
+            android:textSize="@dimen/textSizeBody"
+            android:layout_weight="0.1" />
+
+        <TextView
+            android:id="@+id/tvMessageTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|bottom"
+            android:textColor="@color/textColorHint"
+            android:layout_weight="0.8"
+            android:text="21:20"
+            android:textSize="10sp"
+            android:textStyle="italic"
+            android:padding="5dp"/>
+
+    </LinearLayout>
+
+
+
+
 </LinearLayout>

@@ -2,18 +2,25 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:padding="16dp">
+    android:layout_height="@dimen/heightListItem">
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/heightListItemHalf"
         android:id="@+id/tvChatName"
-        android:text="Chat name"/>
+        android:text="Chat name"
+        android:textSize="@dimen/textSizeSubHeader"
+        android:textColor="@color/textColorPrimary"
+        android:gravity="bottom|left"
+        android:paddingLeft="72dp"/>
     <TextView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="@dimen/heightListItemHalf"
         android:id="@+id/tvLastMessage"
         android:maxLines="1"
         android:ellipsize="end"
+        android:textSize="@dimen/textSizeBody"
+        android:textColor="@color/textColorSecondary"
+        android:gravity="top|left"
+        android:paddingLeft="72dp"
         android:text="Last message was..."/>
 </LinearLayout>

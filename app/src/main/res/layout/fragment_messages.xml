@@ -3,31 +3,34 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:weightSum="15"
-    android:background="#ffca28">
+    android:background="@color/windowBackground"
+    android:weightSum="1">
 
     <TextView
+        android:id="@+id/tvChatName"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:gravity="center"
-        android:layout_weight="7"
+        android:gravity="left|center"
         android:text="Chat name"
-        android:background="#ffa000"
-        android:textSize="20sp"/>
+        android:textColor="@color/textColorPrimaryLight"
+        android:background="@color/colorPrimary"
+        android:textSize="@dimen/textSizeHeader"
+        android:layout_height="@dimen/heightToolbar"
+        android:fontFamily="sans-serif"
+        android:paddingLeft="72dp" />
+
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rvMessages"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="1"/>
+        android:layout_height="wrap_content"
+        android:layout_weight="1" />
 
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:orientation="horizontal"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_weight="7"
-        android:background="#ffa000">
+        android:background="@color/colorPrimary"
+        android:layout_height="45dp">
 
         <EditText
             android:id="@+id/etMessageBox"
@@ -38,19 +41,21 @@
             android:maxLines="2"
             android:hint="Your message here"
             android:layout_alignParentBottom="true"
-            android:layout_alignParentTop="true" />
+            android:layout_alignParentTop="true"
+            android:textColorHint="@color/textColorHintLight"
+            android:textColor="@color/textColorPrimaryLight"/>
 
         <Button
             android:id="@+id/btnSendMessage"
             android:layout_width="96dp"
             android:layout_height="wrap_content"
+            android:layout_margin="3dp"
             android:layout_alignParentBottom="true"
             android:text="Send"
             android:layout_alignParentRight="true"
-
-            android:background="#ffb300"
-            android:layout_alignParentTop="true" />
+            android:layout_alignParentTop="true"
+            android:textColor="@color/textColorPrimaryLight"
+            android:background="@drawable/button"/>
 
     </RelativeLayout>
-
 </LinearLayout>
