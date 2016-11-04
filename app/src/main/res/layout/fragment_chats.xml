@@ -5,15 +5,31 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/heightToolbar"
         android:background="@color/colorPrimary"
-        android:gravity="left|center"
-        android:paddingLeft="72dp"
-        android:text="Messenger"
-        android:textColor="@color/textColorPrimaryLight"
-        android:textSize="@dimen/textSizeHeader" />
+        android:weightSum="1">
+
+        <Button
+            android:id="@+id/btnLogOut"
+            android:layout_width="32dp"
+            android:layout_height="match_parent"
+            android:layout_gravity="top|left"
+            android:background="@drawable/sign_out"
+            android:layout_margin="10dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/heightToolbar"
+            android:gravity="left|center"
+            android:text="Messenger"
+            android:paddingLeft="20dp"
+            android:textColor="@color/textColorPrimaryLight"
+            android:textSize="@dimen/textSizeHeader" />
+
+    </LinearLayout>
+
 
     <android.support.design.widget.CoordinatorLayout
         android:layout_width="match_parent"

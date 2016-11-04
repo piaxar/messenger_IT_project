@@ -27,6 +27,7 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
     MessagesFragment messagesFragment;
     ChatsFragment chatsFragment;
     ViewPager viewPager;
+    SharedPreferences sharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,7 +39,7 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
         adapter = new MyPagerAdapter(getSupportFragmentManager(), chatsFragment, messagesFragment);
         viewPager.setAdapter(adapter);
         viewPager.setPageTransformer(true, new DepthPageTransformer());
-        SharedPreferences sharedPreferences = getSharedPreferences(Config.SHARED_PREF_NAME, MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(Config.SHARED_PREF_NAME, MODE_PRIVATE);
 
         if (sharedPreferences.contains(Config.TOKEN_SHARED_PREF) == false) {
             Intent intent = new Intent(this, LoginActivity.class);
@@ -88,6 +89,11 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
         messagesFragment.setChat(chat);
         // Switch viewPager to messages fragment
         viewPager.setCurrentItem(1);
+    }
+
+    @Override
+    public void onLogOut() {
+        sharedPreferences.edit().clear().commit();
     }
 
     @Override
