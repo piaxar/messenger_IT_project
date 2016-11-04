@@ -18,9 +18,15 @@ public interface SereverRequests {
 
     public ArrayList<Integer> getChatMessagesIdsById(int chatId);
 
+    public ArrayList<Integer> getChatMessagesIdsByIdsFromCurentId(int chatId, int startMessageId);
+
     public ArrayList<Message> getChatMesseges(int chatId);
 
     public String getMessageContentById(int messegeId);
 
     public Message getMessageById(int messegeId);
+
+    public void sendMessage(int chatId, String message);
+
+    public void createNewPrivateChat(String userLogin);
 }

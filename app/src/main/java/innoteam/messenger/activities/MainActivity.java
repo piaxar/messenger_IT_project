@@ -12,6 +12,7 @@ import com.ToxicBakery.viewpager.transforms.CubeOutTransformer;
 
 import innoteam.messenger.R;
 import innoteam.messenger.adapters.MyPagerAdapter;
+import innoteam.messenger.adapters.ServerAdapter;
 import innoteam.messenger.configs.Config;
 import innoteam.messenger.fragments.ChatsFragment;
 import innoteam.messenger.fragments.MessagesFragment;
@@ -51,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
                 networkHelper.tokenRefresher(this);
             }
         }
-        //System.out.println(ServerAdapter.INSTANCE.getChatMessagesIdsById(2));
+        ServerAdapter.INSTANCE.getAllUsers(4);
     }
 
     @Override
