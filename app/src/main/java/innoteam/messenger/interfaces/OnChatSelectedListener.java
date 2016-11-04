@@ -8,4 +8,5 @@ import innoteam.messenger.models.Chat;
 
 public interface OnChatSelectedListener {
     public void onChatSelected(Chat chat);
+    public void onLogOut();
 }
