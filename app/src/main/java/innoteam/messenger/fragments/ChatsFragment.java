@@ -159,6 +159,10 @@ public class ChatsFragment extends Fragment {
     private void updateDataset(){
         chats.clear();
         chats.addAll(DataProvider.getInstance().getChats());
+        Log.d(TAG, "get chatfragment update dataset");
+        for (Chat chat: DataProvider.getInstance().getChats()){
+            Log.d(TAG, chat.getChatName());
+        }
     }
 
 }
