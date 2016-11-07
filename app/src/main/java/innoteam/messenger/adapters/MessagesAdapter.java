@@ -68,7 +68,7 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         tvMessageContent.setText(message.getContent());
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(message.getSendTime());
-        tvMessageTime.setText(calendar.get(Calendar.HOUR) +":"+ calendar.get(calendar.MINUTE));
+        tvMessageTime.setText(calendar.get(Calendar.HOUR_OF_DAY) +":"+ calendar.get(calendar.MINUTE));
         Log.d(TAG, "Element " + position + " set.");
     }
 

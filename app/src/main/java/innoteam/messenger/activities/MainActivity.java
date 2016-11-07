@@ -12,7 +12,6 @@ import com.ToxicBakery.viewpager.transforms.DepthPageTransformer;
 
 import innoteam.messenger.R;
 import innoteam.messenger.adapters.MyPagerAdapter;
-import innoteam.messenger.adapters.ServerAdapter;
 import innoteam.messenger.configs.Config;
 import innoteam.messenger.fragments.ChatsFragment;
 import innoteam.messenger.fragments.MessagesFragment;
@@ -53,7 +52,6 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
                 networkHelper.tokenRefresher(this);
             }
         }
-        ServerAdapter.INSTANCE.getAllUsers(4);
     }
 
     @Override
