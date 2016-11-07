@@ -10,14 +10,13 @@ import android.view.MenuItem;
 
 import com.ToxicBakery.viewpager.transforms.DepthPageTransformer;
 
+import innoteam.messenger.DataProvider;
 import innoteam.messenger.R;
 import innoteam.messenger.adapters.MyPagerAdapter;
-import innoteam.messenger.adapters.ServerAdapter;
 import innoteam.messenger.configs.Config;
 import innoteam.messenger.fragments.ChatsFragment;
 import innoteam.messenger.fragments.MessagesFragment;
 import innoteam.messenger.interfaces.OnChatSelectedListener;
-import innoteam.messenger.models.Chat;
 import innoteam.messenger.network.NetworkHelper;
 
 public class MainActivity extends AppCompatActivity implements OnChatSelectedListener{
@@ -33,13 +32,21 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        DataProvider.getInstance().initDataset();
+
+        // Inflate
         viewPager = (ViewPager) findViewById(R.id.viewPager);
+
+        // objects initiation
         chatsFragment = new ChatsFragment();
         messagesFragment = new MessagesFragment();
         adapter = new MyPagerAdapter(getSupportFragmentManager(), chatsFragment, messagesFragment);
+        sharedPreferences = getSharedPreferences(Config.SHARED_PREF_NAME, MODE_PRIVATE);
+
         viewPager.setAdapter(adapter);
         viewPager.setPageTransformer(true, new DepthPageTransformer());
-        sharedPreferences = getSharedPreferences(Config.SHARED_PREF_NAME, MODE_PRIVATE);
+
 
         if (sharedPreferences.contains(Config.TOKEN_SHARED_PREF) == false) {
             Intent intent = new Intent(this, LoginActivity.class);
@@ -53,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
                 networkHelper.tokenRefresher(this);
             }
         }
-        ServerAdapter.INSTANCE.getAllUsers(4);
     }
 
     @Override
@@ -84,9 +90,10 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
     }
 
     @Override
-    public void onChatSelected(Chat chat) {
+    public void onChatSelected(int chatId) {
 
-        messagesFragment.setChat(chat);
+        messagesFragment.setChat(chatId);
+
         // Switch viewPager to messages fragment
         viewPager.setCurrentItem(1);
     }
