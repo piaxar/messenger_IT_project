@@ -1,5 +1,7 @@
 package innoteam.messenger;
 
+import android.util.Log;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -12,8 +14,8 @@ import innoteam.messenger.models.Message;
  */
 
 public class DataProvider {
-    private final String TAG = "DataProvider";
-    private static ArrayList<Chat> chats;
+    private static final String TAG = "DataProvider";
+    private ArrayList<Chat> chats;
 
     public static final DataProvider INSTANCE = new DataProvider();
 
@@ -22,10 +24,14 @@ public class DataProvider {
     }
 
     private DataProvider(){
-        chats = new ArrayList<>();
     }
 
     public ArrayList<Chat> getChats() {
+        Log.d(TAG, "get chats");
+        for (Chat chat: chats){
+            Log.d(TAG, chat.getChatName());
+        }
+
         return chats;
     }
 
@@ -36,6 +42,10 @@ public class DataProvider {
     public void initDataset() {
         chats = new ArrayList<>();
         chats.addAll(ServerAdapter.INSTANCE.getAllChats());
+        Log.d(TAG, "init dataset");
+        for (Chat chat: chats){
+            Log.d(TAG, chat.getChatName());
+        }
     }
 
     public Chat getChat(int chatId) {
