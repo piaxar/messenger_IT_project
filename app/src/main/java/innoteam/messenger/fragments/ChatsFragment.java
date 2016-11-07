@@ -23,6 +23,7 @@ import android.widget.EditText;
 
 import java.util.ArrayList;
 
+import innoteam.messenger.DataProvider;
 import innoteam.messenger.R;
 import innoteam.messenger.activities.MainActivity;
 import innoteam.messenger.adapters.ChatsAdapter;
@@ -52,27 +53,22 @@ public class ChatsFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        chats  = new ArrayList<>();
         initDataset();
-    }
-
-    private void initDataset() {
-        chats.clear();
-        chats.addAll(ServerAdapter.INSTANCE.getAllChats());
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
-        adapter = new ChatsAdapter(chats);
-        cnt = getContext();
-        mLayoutManager = new LinearLayoutManager(getActivity());
-        btnWriteMessage = (FloatingActionButton) view.findViewById(R.id.btnAddChat);
+
         searchView = (SearchView) view.findViewById(R.id.search_bar);
         rvChats = (RecyclerView) view.findViewById(R.id.rvChats);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
         Button logOutBtn = (Button) view.findViewById(R.id.btnLogOut);
         addChatBtn = (FloatingActionButton) view.findViewById(R.id.btnAddChat);
+        adapter = new ChatsAdapter(chats);
+
+        cnt = getContext();
+        mLayoutManager = new LinearLayoutManager(getActivity());
 
         rvChats.setAdapter(adapter);
         rvChats.addItemDecoration(new SimpleDividerItemDecoration(getContext()));
@@ -80,9 +76,7 @@ public class ChatsFragment extends Fragment {
         rvChats.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), rvChats, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                // TODO send chat id instead of position
-                // but seems to be alright
-                mListener.onChatSelected(chats.get(position));
+                mListener.onChatSelected(chats.get(position).getChatId());
             }
 
             @Override
@@ -90,18 +84,12 @@ public class ChatsFragment extends Fragment {
                 // ...
             }
         }));
-        btnWriteMessage.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Log.d(TAG, "On button click");
-            }
-        });
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 // TODO add refresher
                 Log.d(TAG, "Refreshed");
-                initDataset();
+                updateDataset();
                 adapter.notifyDataSetChanged();
                 swipeRefreshLayout.setRefreshing(false);
 
@@ -122,13 +110,13 @@ public class ChatsFragment extends Fragment {
         addChatBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showChangeLangDialog();
+                showCreateChatDialog();
             }
         });
         return view;
     }
 
-    public void showChangeLangDialog() {
+    public void showCreateChatDialog() {
         AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(cnt);
         LayoutInflater inflater = getActivity().getLayoutInflater();
         final View dialogView = inflater.inflate(R.layout.custom_dialog, null);
@@ -154,7 +142,6 @@ public class ChatsFragment extends Fragment {
         b.show();
     }
 
-
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -163,6 +150,15 @@ public class ChatsFragment extends Fragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString() + " must implement OnChatSelectedListener");
         }
+    }
+
+    private void initDataset() {
+        chats = DataProvider.getInstance().getChats();
+    }
+
+    private void updateDataset(){
+        chats.clear();
+        chats.addAll(DataProvider.getInstance().getChats());
     }
 
 }
