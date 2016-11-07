@@ -1,6 +1,7 @@
 package innoteam.messenger.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -26,7 +27,7 @@ import innoteam.messenger.models.Message;
  * Created by ivan on 24.10.16.
  */
 
-public class MessagesFragment extends Fragment{
+public class MessagesFragment extends Fragment {
     private final String TAG = "Messages fragment";
     // Remove:
     private ArrayList<Message> messages;
@@ -37,6 +38,9 @@ public class MessagesFragment extends Fragment{
     private TextView chatName;
     private Button sendBtn;
     private EditText messageField;
+    private DataProvider dataProvider;
+    private Boolean chatAvailable = false;
+    private Boolean update = true;
 
     private int chatId;
 
@@ -78,18 +82,35 @@ public class MessagesFragment extends Fragment{
                     ServerAdapter.INSTANCE.sendMessage(chatId, msg);
                     messageField.setText("");
                     Log.d(TAG, "message send");
+                    DataProvider.getInstance().getChat(chatId).checkForUpdates();
                     updateMessages();
-
                 }
 
             }
         });
+
+        final Handler h = new Handler();
+        final int delay = 1000;
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (chatAvailable) {
+                    Log.d(TAG, "post delayed");
+                    DataProvider.getInstance().getChat(chatId).checkForUpdates();
+                    if (DataProvider.getInstance().getChat(chatId).updateFound) {
+                        updateMessages();
+                    }
+                }
+                h.postDelayed(this, delay);
+            }
+        }, delay);
 
         return view;
     }
 
     public void setChat(int chatId){
         this.chatId = chatId;
+        chatAvailable = true;
         chatName.setText(DataProvider.getInstance().getChat(chatId).getChatName());
         updateMessages();
     }

@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -14,12 +15,12 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -46,20 +47,18 @@ public class ChatsFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private Context cnt;
     private FloatingActionButton addChatBtn;
+    TextView header;
     LinearLayoutManager mLayoutManager;
     OnChatSelectedListener mListener;
     SearchView searchView;
 
     @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initDataset();
-    }
-
-    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_chats, container, false);
 
+        initDataset();
+
+        header = (TextView) view.findViewById(R.id.tvHeader);
         searchView = (SearchView) view.findViewById(R.id.search_bar);
         rvChats = (RecyclerView) view.findViewById(R.id.rvChats);
         swipeRefreshLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
@@ -87,11 +86,8 @@ public class ChatsFragment extends Fragment {
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                // TODO add refresher
-                Log.d(TAG, "Refreshed");
-                updateDataset();
-                adapter.notifyDataSetChanged();
-                swipeRefreshLayout.setRefreshing(false);
+                Updater updater = new Updater();
+                updater.execute();
 
             }
         });
@@ -114,6 +110,21 @@ public class ChatsFragment extends Fragment {
             }
         });
         return view;
+    }
+
+    class Updater extends AsyncTask<Void, Void, Void>{
+        @Override
+        protected Void doInBackground(Void... params) {
+            updateDataset();
+            adapter.notifyDataSetChanged();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            swipeRefreshLayout.setRefreshing(false);
+            super.onPostExecute(aVoid);
+        }
     }
 
     public void showCreateChatDialog() {
@@ -153,16 +164,16 @@ public class ChatsFragment extends Fragment {
     }
 
     private void initDataset() {
-        chats = DataProvider.getInstance().getChats();
+        chats = new ArrayList<>();
+        chats.addAll(DataProvider.getInstance().getChats());
     }
 
     private void updateDataset(){
         chats.clear();
         chats.addAll(DataProvider.getInstance().getChats());
-        Log.d(TAG, "get chatfragment update dataset");
-        for (Chat chat: DataProvider.getInstance().getChats()){
-            Log.d(TAG, chat.getChatName());
-        }
     }
 
+    public TextView getHeader() {
+        return header;
+    }
 }

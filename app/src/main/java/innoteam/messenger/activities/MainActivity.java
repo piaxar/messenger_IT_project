@@ -2,11 +2,10 @@ package innoteam.messenger.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.view.MenuItem;
 
 import com.ToxicBakery.viewpager.transforms.DepthPageTransformer;
 
@@ -33,7 +32,7 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        DataProvider.getInstance().initDataset();
+
 
         // Inflate
         viewPager = (ViewPager) findViewById(R.id.viewPager);
@@ -60,6 +59,8 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
                 networkHelper.tokenRefresher(this);
             }
         }
+
+        DataProvider.getInstance().initDataset();
     }
 
     @Override
@@ -68,34 +69,15 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
-
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
     public void onChatSelected(int chatId) {
 
+        chatsFragment.getHeader().setText("Updating...");
         messagesFragment.setChat(chatId);
+        chatsFragment.getHeader().setText("Messenger");
+        viewPager.setCurrentItem(1);
 
         // Switch viewPager to messages fragment
-        viewPager.setCurrentItem(1);
+
     }
 
     @Override
@@ -109,6 +91,29 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
         if (resultCode == RESULT_OK && requestCode == REQUEST_SIGNUP) {
             IS_LOGED = true;
             onResume();
+        }
+    }
+
+    class Loader extends AsyncTask<Integer, Void, Void>{
+
+        @Override
+        protected void onPreExecute() {
+            super.onPreExecute();
+            chatsFragment.getHeader().setText("Updating...");
+        }
+
+        @Override
+        protected Void doInBackground(Integer... params) {
+            for(Integer in: params){
+                messagesFragment.setChat(in);
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+
         }
     }
 }

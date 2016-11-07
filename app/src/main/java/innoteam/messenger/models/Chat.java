@@ -1,7 +1,5 @@
 package innoteam.messenger.models;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 
 import innoteam.messenger.adapters.ServerAdapter;
@@ -14,45 +12,43 @@ public class Chat {
     private int chatId;
     private String chatName;
     private int lastMessageId;
+    public boolean isDataUpdated;
+    public boolean updateFound = false;
+
     private ArrayList<Message> messages;
-    private Message lastMessage;
+    private ArrayList<Integer> messagesIds;
+
     private final String TAG = "Chat model";
-    private boolean isLastMessageSet;
 
 
     public Chat(String chatName, int lastMessageId, int chatId) {
         this.chatName = chatName;
         this.lastMessageId = lastMessageId;
         this.chatId = chatId;
-        lastMessage = getMessageById(lastMessageId);
-        isLastMessageSet = true;
+
+        messages = new ArrayList<>();
+        messagesIds = new ArrayList<>();
+        isDataUpdated = false;
+
     }
 
     public Chat(String chatName, int chatId){
         this.chatName = chatName;
         this.chatId = chatId;
-        isLastMessageSet = false;
-    }
 
-    public void setLastMessageId(int lastMessageId){
-        this.lastMessageId = lastMessageId;
-        lastMessage = getMessageById(lastMessageId);
-        isLastMessageSet = true;
+        messages = new ArrayList<>();
+        messagesIds = new ArrayList<>();
+        isDataUpdated = true;
     }
 
     public ArrayList<Message> getAllMessages() {
-        Log.d(TAG, "Getting all messages to chat");
-        messages =  ServerAdapter.INSTANCE.getChatMessagesById(chatId);
-        for (Message msg: messages){
-            Log.d(TAG, "Get message with content: "+ msg.getContent());
-        }
-        Log.d(TAG, "Finish getting");
+        updateData();
         return messages;
     }
 
     public String getLastMessageContent(){
-        if (isLastMessageSet)
-            return lastMessage.getContent();
+        if (!messagesIds.isEmpty())
+            return getMessageById(lastMessageId).getContent();
         else return "";
     }
 
@@ -66,5 +62,29 @@ public class Chat {
 
     private Message getMessageById(int messageId){
         return ServerAdapter.INSTANCE.getMessageById(messageId);
+    }
+
+    public void updateData(){
+       if (!isDataUpdated){
+           messagesIds.clear();
+           messagesIds.addAll(ServerAdapter.INSTANCE.getChatMessagesIdsById(chatId));
+           if(messagesIds.size() == messages.size()){
+               isDataUpdated = true;
+           } else {
+               for (int i = messages.size(); i < messagesIds.size(); i++){
+                   messages.add(getMessageById(messagesIds.get(i)));
+               }
+               lastMessageId = messagesIds.get(messagesIds.size()-1);
+           }
+           isDataUpdated = true;
+           updateFound = false;
+       }
+    }
+
+    public void checkForUpdates(){
+        if (ServerAdapter.INSTANCE.getChatMessagesIdsByIdsFromCurentId(chatId, lastMessageId).size() > 0){
+            isDataUpdated = false;
+            updateFound = true;
+        }
     }
 }
