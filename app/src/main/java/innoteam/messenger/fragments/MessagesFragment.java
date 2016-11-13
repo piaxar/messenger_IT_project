@@ -29,9 +29,7 @@ import innoteam.messenger.models.Message;
 
 public class MessagesFragment extends Fragment {
     private final String TAG = "Messages fragment";
-    // Remove:
     private ArrayList<Message> messages;
-    //
     private MessagesAdapter adapter;
     private RecyclerView rvMessages;
     private LinearLayoutManager mLayoutManager;
@@ -57,6 +55,7 @@ public class MessagesFragment extends Fragment {
         messages = new ArrayList<>();
         adapter = new MessagesAdapter(messages);
         mLayoutManager = new LinearLayoutManager(getActivity());
+        //if(mLayoutManager.findFirstCompletelyVisibleItemPosition() == 0)
 
         rvMessages.setAdapter(adapter);
         rvMessages.setLayoutManager(mLayoutManager);

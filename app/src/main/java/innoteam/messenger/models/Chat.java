@@ -28,6 +28,7 @@ public class Chat {
 
         messages = new ArrayList<>();
         messagesIds = new ArrayList<>();
+        messagesIds.addAll(ServerAdapter.INSTANCE.getChatMessagesIdsById(chatId));
         isDataUpdated = false;
 
     }

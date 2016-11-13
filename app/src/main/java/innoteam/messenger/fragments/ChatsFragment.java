@@ -107,6 +107,8 @@ public class ChatsFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 showCreateChatDialog();
+                Updater updater = new Updater();
+                updater.execute();
             }
         });
         return view;

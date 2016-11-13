@@ -2,7 +2,6 @@ package innoteam.messenger.activities;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -74,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
         chatsFragment.getHeader().setText("Updating...");
         messagesFragment.setChat(chatId);
         chatsFragment.getHeader().setText("Messenger");
-        viewPager.setCurrentItem(1);
+        viewPager.setCurrentItem(1, true);
 
         // Switch viewPager to messages fragment
 
@@ -94,26 +93,8 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
         }
     }
 
-    class Loader extends AsyncTask<Integer, Void, Void>{
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-            chatsFragment.getHeader().setText("Updating...");
-        }
-
-        @Override
-        protected Void doInBackground(Integer... params) {
-            for(Integer in: params){
-                messagesFragment.setChat(in);
-            }
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            super.onPostExecute(aVoid);
-
-        }
+    @Override
+    public void onBackPressed() {
+        viewPager.setCurrentItem(0, true);
     }
 }
