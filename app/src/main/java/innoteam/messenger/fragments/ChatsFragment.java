@@ -15,6 +15,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -47,7 +48,7 @@ public class ChatsFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private Context cnt;
     private FloatingActionButton addChatBtn;
-    TextView header;
+    private TextView header;
     LinearLayoutManager mLayoutManager;
     OnChatSelectedListener mListener;
     SearchView searchView;
@@ -75,6 +76,7 @@ public class ChatsFragment extends Fragment {
         rvChats.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), rvChats, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+                Log.d(TAG," Chatfragment at on click:"+ chats.get(position).getChatId());
                 mListener.onChatSelected(chats.get(position).getChatId());
             }
 
@@ -175,7 +177,4 @@ public class ChatsFragment extends Fragment {
         chats.addAll(DataProvider.getInstance().getChats());
     }
 
-    public TextView getHeader() {
-        return header;
-    }
 }

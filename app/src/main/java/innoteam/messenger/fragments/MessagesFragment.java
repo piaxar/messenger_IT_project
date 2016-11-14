@@ -122,6 +122,7 @@ public class MessagesFragment extends Fragment {
     public void updateMessages(){
         updateData();
         adapter.notifyDataSetChanged();
-        rvMessages.smoothScrollToPosition(adapter.getItemCount());
+        //rvMessages.smoothScrollToPosition(adapter.getItemCount());
+        rvMessages.scrollToPosition(adapter.getItemCount() - 1 );
     }
 }

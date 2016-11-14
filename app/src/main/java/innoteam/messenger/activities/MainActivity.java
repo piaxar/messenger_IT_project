@@ -31,8 +31,6 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-
-
         // Inflate
         viewPager = (ViewPager) findViewById(R.id.viewPager);
 
@@ -64,20 +62,32 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
 
     @Override
     protected void onResume() {
+        if (sharedPreferences.contains(Config.TOKEN_SHARED_PREF) == false) {
+            Intent intent = new Intent(this, LoginActivity.class);
+            startActivity(intent);
+        }
+        else {
+            NetworkHelper networkHelper = new NetworkHelper();
+
+
+            if (!networkHelper.isTokenFresh(this)){
+                networkHelper.tokenRefresher(this);
+            }
+        }
+
+        DataProvider.getInstance().initDataset();
         super.onResume();
     }
 
     @Override
     public void onChatSelected(int chatId) {
-
-        chatsFragment.getHeader().setText("Updating...");
         messagesFragment.setChat(chatId);
-        chatsFragment.getHeader().setText("Messenger");
         viewPager.setCurrentItem(1, true);
 
         // Switch viewPager to messages fragment
 
     }
+
 
     @Override
     public void onLogOut() {
