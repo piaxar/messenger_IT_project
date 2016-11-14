@@ -9,6 +9,9 @@ import innoteam.messenger.adapters.ServerAdapter;
  */
 
 public class Chat {
+    private int firstMessageId;
+    private int messagesDownloaded;
+    private boolean allMessagesDownloaded;
     private int chatId;
     private String chatName;
     private int lastMessageId;
@@ -18,6 +21,7 @@ public class Chat {
     private ArrayList<Message> messages;
     private ArrayList<Integer> messagesIds;
 
+    private final int MESSAGES_OFFSET = 15;
     private final String TAG = "Chat model";
 
 
@@ -28,6 +32,17 @@ public class Chat {
 
         messages = new ArrayList<>();
         messagesIds = new ArrayList<>();
+        messagesIds.addAll(ServerAdapter.INSTANCE.getChatMessagesIdsById(chatId));
+
+        if (messagesIds.size() > MESSAGES_OFFSET){
+            firstMessageId = messagesIds.get(messagesIds.size() - MESSAGES_OFFSET + 1);
+            messagesDownloaded = MESSAGES_OFFSET;
+            allMessagesDownloaded = false;
+        } else {
+            firstMessageId = messagesIds.get(0);
+            allMessagesDownloaded = true;
+        }
+
         isDataUpdated = false;
 
     }
@@ -38,6 +53,7 @@ public class Chat {
 
         messages = new ArrayList<>();
         messagesIds = new ArrayList<>();
+        allMessagesDownloaded = true;
         isDataUpdated = true;
     }
 
