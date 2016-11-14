@@ -20,6 +20,7 @@
             android:layout_margin="10dp" />
 
         <TextView
+            android:id="@+id/tvHeader"
             android:layout_width="match_parent"
             android:layout_height="@dimen/heightToolbar"
             android:gravity="left|center"

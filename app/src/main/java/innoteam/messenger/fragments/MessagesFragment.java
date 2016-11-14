@@ -1,6 +1,7 @@
 package innoteam.messenger.fragments;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.LinearLayoutManager;
@@ -15,41 +16,48 @@ import android.widget.TextView;
 
 import java.util.ArrayList;
 
+import innoteam.messenger.DataProvider;
 import innoteam.messenger.R;
 import innoteam.messenger.adapters.MessagesAdapter;
 import innoteam.messenger.adapters.ServerAdapter;
 import innoteam.messenger.listeners.RecyclerItemClickListener;
-import innoteam.messenger.models.Chat;
 import innoteam.messenger.models.Message;
 
 /**
  * Created by ivan on 24.10.16.
  */
 
-public class MessagesFragment extends Fragment{
+public class MessagesFragment extends Fragment {
     private final String TAG = "Messages fragment";
+    // Remove:
     private ArrayList<Message> messages;
+    //
     private MessagesAdapter adapter;
     private RecyclerView rvMessages;
     private LinearLayoutManager mLayoutManager;
     private TextView chatName;
     private Button sendBtn;
     private EditText messageField;
-    private Chat chat;
+    private DataProvider dataProvider;
+    private Boolean chatAvailable = false;
+    private Boolean update = true;
+
+    private int chatId;
 
 
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_messages, container, false);
-        messages = new ArrayList<>();
 
-        adapter = new MessagesAdapter(messages);
-        mLayoutManager = new LinearLayoutManager(getActivity());
         chatName = (TextView) view.findViewById(R.id.tvChatName);
         sendBtn = (Button) view.findViewById(R.id.btnSendMessage);
         messageField = (EditText) view.findViewById(R.id.etMessageBox);
-
         rvMessages = (RecyclerView) view.findViewById(R.id.rvMessages);
+
+        messages = new ArrayList<>();
+        adapter = new MessagesAdapter(messages);
+        mLayoutManager = new LinearLayoutManager(getActivity());
+
         rvMessages.setAdapter(adapter);
         rvMessages.setLayoutManager(mLayoutManager);
         rvMessages.addOnItemTouchListener(new RecyclerItemClickListener(getActivity(), rvMessages, new RecyclerItemClickListener.OnItemClickListener() {
@@ -71,32 +79,50 @@ public class MessagesFragment extends Fragment{
                 rvMessages.smoothScrollToPosition(adapter.getItemCount());
                 String msg = messageField.getText().toString();
                 if (!msg.equals("")){
-                    ServerAdapter.INSTANCE.sendMessage(chat.getChatId(), msg);
+                    ServerAdapter.INSTANCE.sendMessage(chatId, msg);
                     messageField.setText("");
                     Log.d(TAG, "message send");
-                    messages.clear();
-                    messages.addAll(chat.getAllMessages());
-                    adapter.notifyDataSetChanged();
-                    rvMessages.smoothScrollToPosition(adapter.getItemCount());
-
+                    DataProvider.getInstance().getChat(chatId).checkForUpdates();
+                    updateMessages();
                 }
 
             }
         });
 
+        final Handler h = new Handler();
+        final int delay = 1000;
+        h.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (chatAvailable) {
+                    Log.d(TAG, "post delayed");
+                    DataProvider.getInstance().getChat(chatId).checkForUpdates();
+                    if (DataProvider.getInstance().getChat(chatId).updateFound) {
+                        updateMessages();
+                    }
+                }
+                h.postDelayed(this, delay);
+            }
+        }, delay);
+
         return view;
     }
 
-    // TODO send messages
+    public void setChat(int chatId){
+        this.chatId = chatId;
+        chatAvailable = true;
+        chatName.setText(DataProvider.getInstance().getChat(chatId).getChatName());
+        updateMessages();
+    }
 
-    public void setChat(Chat chats) {
-        this.chat = chats;
-        chatName.setText(chat.getChatName());
+    public void updateData(){
         messages.clear();
-        messages.addAll(chat.getAllMessages());
-        Log.d(TAG, "in set chat");
+        messages.addAll(DataProvider.getInstance().getMessagesFrom(chatId));
+    }
+
+    public void updateMessages(){
+        updateData();
         adapter.notifyDataSetChanged();
         rvMessages.smoothScrollToPosition(adapter.getItemCount());
-        Log.d(TAG,"" + adapter.getItemCount());
     }
 }
