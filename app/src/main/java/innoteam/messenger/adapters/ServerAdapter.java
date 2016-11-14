@@ -29,6 +29,7 @@ import java.util.zip.Inflater;
 import innoteam.messenger.configs.Config;
 import innoteam.messenger.interfaces.SereverRequests;
 import innoteam.messenger.models.Chat;
+import innoteam.messenger.models.CompressedContent;
 import innoteam.messenger.models.Message;
 import innoteam.messenger.models.User;
 
@@ -38,6 +39,7 @@ import innoteam.messenger.models.User;
 
 public class  ServerAdapter implements SereverRequests{
     private final String TAG = "ServerAdapter";
+    private final int MIN_COMPRESSED_STRING_LENGTH = 5;
 
     public static final ServerAdapter INSTANCE = new ServerAdapter();
 
@@ -254,8 +256,8 @@ public class  ServerAdapter implements SereverRequests{
     }
 
     @Override
-    public String getMessageContentById(int messageId) {
-        String res = null;
+    public CompressedContent getMessageContentById(int messageId) {
+        CompressedContent comCont = new CompressedContent();
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost p = new HttpPost(Config.GET_MESSAGE_CONTENT + String.valueOf(messageId));
         try {
@@ -267,7 +269,7 @@ public class  ServerAdapter implements SereverRequests{
                 Log.i(TAG, "getMessageContent By Id: Response code:" + String.valueOf(response.getStatusLine().getStatusCode()));
                 if (response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES) {
                     byte[] content = EntityUtils.toByteArray(response.getEntity());
-                    if (content.length > 30) {
+                    if (content.length > MIN_COMPRESSED_STRING_LENGTH) {
                         Inflater decompresser = new Inflater();
                         decompresser.setInput(content);
 
@@ -284,10 +286,14 @@ public class  ServerAdapter implements SereverRequests{
                         Log.d(TAG, "Byte array has been decompressed!");
                         Log.d(TAG, "Size of original got array: " + content.length);
                         Log.d(TAG, "Size of uncompresed array is: " + output.length);
-                        res = new String(output, 0, output.length, "UTF-8");
+                        comCont.content = new String(output, 0, output.length, "UTF-8");
+                        comCont.compressed = content.length;
+                        comCont.uncompressed = output.length;
                     }
                     else {
-                        res = new String(content, "UTF-8");
+                        comCont.content = new String(content, "UTF-8");
+                        comCont.compressed = content.length;
+                        comCont.uncompressed = content.length;
                     }
                     //res = new String(result, 0, content.length, "UTF-8");
                 }
@@ -295,7 +301,7 @@ public class  ServerAdapter implements SereverRequests{
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return res;
+        return comCont;
     }
 
     @Override
@@ -329,7 +335,7 @@ public class  ServerAdapter implements SereverRequests{
 
     public void sendMessage(int chatId, String message) {
         /* Encode messege */
-        if (message.length() > 30) {
+        if (message.length() > MIN_COMPRESSED_STRING_LENGTH) {
             byte[] getByte = message.getBytes();
 
             Deflater compresser = new Deflater();

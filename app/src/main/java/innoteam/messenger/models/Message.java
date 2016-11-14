@@ -11,12 +11,32 @@ public class Message {
     private final String senderName;
     private final Date sendTime;
     private final String content;
+    private long compressedLength;
+    private long uncompressedLength;
 
     public Message(int messageID, String senderName, Date sendTime, String content) {
         this.messageID = messageID;
         this.senderName = senderName;
         this.sendTime = sendTime;
         this.content = content;
+    }
+
+    public Message(int messageID, String senderName, Date sendTime, CompressedContent comCont) {
+        this.messageID = messageID;
+        this.senderName = senderName;
+        this.sendTime = sendTime;
+        this.content = comCont.content;
+        this.compressedLength = comCont.compressed;
+        this.uncompressedLength = comCont.uncompressed;
+
+    }
+
+    public long getCompressedLength() {
+        return compressedLength;
+    }
+
+    public long getUncompressedLength() {
+        return uncompressedLength;
     }
 
     public String getSenderName() {

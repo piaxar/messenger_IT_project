@@ -3,6 +3,7 @@ package innoteam.messenger.interfaces;
 import java.util.ArrayList;
 
 import innoteam.messenger.models.Chat;
+import innoteam.messenger.models.CompressedContent;
 import innoteam.messenger.models.Message;
 
 /**
@@ -22,7 +23,7 @@ public interface SereverRequests {
 
     public ArrayList<Message> getChatMesseges(int chatId);
 
-    public String getMessageContentById(int messegeId);
+    public CompressedContent getMessageContentById(int messegeId);
 
     public Message getMessageById(int messegeId);
 
