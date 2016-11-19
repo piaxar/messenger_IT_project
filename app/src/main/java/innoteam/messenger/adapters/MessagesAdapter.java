@@ -27,12 +27,14 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         public final TextView senderName;
         public final TextView messageContent;
         public final TextView messageTime;
+        public final TextView compressedData;
 
         public ViewHolder(View itemView) {
             super(itemView);
             senderName = (TextView) itemView.findViewById(R.id.tvUserName);
             messageContent = (TextView) itemView.findViewById(R.id.tvMessage);
             messageTime = (TextView) itemView.findViewById(R.id.tvMessageTime);
+            compressedData = (TextView) itemView.findViewById(R.id.tvStat);
         }
     }
 
@@ -63,12 +65,17 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         TextView tvSenderName = viewHolder.senderName;
         TextView tvMessageContent = viewHolder.messageContent;
         TextView tvMessageTime = viewHolder.messageTime;
+        TextView tvStat = viewHolder.compressedData;
 
         tvSenderName.setText(message.getSenderName());
         tvMessageContent.setText(message.getContent());
         Calendar calendar = GregorianCalendar.getInstance();
         calendar.setTime(message.getSendTime());
-        tvMessageTime.setText(calendar.get(Calendar.HOUR) +":"+ calendar.get(calendar.MINUTE));
+        String currTime = String.format("%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(calendar.MINUTE));
+        tvMessageTime.setText(currTime);
+
+        tvStat.setText("Size in bytes: "+ message.getUncompressedLength()+". Compressed size: "+message.getCompressedLength()+".");
+
         Log.d(TAG, "Element " + position + " set.");
     }
 

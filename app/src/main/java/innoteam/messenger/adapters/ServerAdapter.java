@@ -6,6 +6,7 @@ import android.util.Log;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ByteArrayEntity;
 import org.apache.http.entity.InputStreamEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -15,15 +16,20 @@ import org.json.JSONTokener;
 
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.zip.Deflater;
+import java.util.zip.Inflater;
 
 import innoteam.messenger.configs.Config;
 import innoteam.messenger.interfaces.SereverRequests;
 import innoteam.messenger.models.Chat;
+import innoteam.messenger.models.CompressedContent;
 import innoteam.messenger.models.Message;
 import innoteam.messenger.models.User;
 
@@ -33,6 +39,7 @@ import innoteam.messenger.models.User;
 
 public class  ServerAdapter implements SereverRequests{
     private final String TAG = "ServerAdapter";
+    private final int MIN_COMPRESSED_STRING_LENGTH = 5;
 
     public static final ServerAdapter INSTANCE = new ServerAdapter();
 
@@ -249,8 +256,8 @@ public class  ServerAdapter implements SereverRequests{
     }
 
     @Override
-    public String getMessageContentById(int messageId) {
-        String res = null;
+    public CompressedContent getMessageContentById(int messageId) {
+        CompressedContent comCont = new CompressedContent();
         HttpClient httpClient = new DefaultHttpClient();
         HttpPost p = new HttpPost(Config.GET_MESSAGE_CONTENT + String.valueOf(messageId));
         try {
@@ -262,13 +269,39 @@ public class  ServerAdapter implements SereverRequests{
                 Log.i(TAG, "getMessageContent By Id: Response code:" + String.valueOf(response.getStatusLine().getStatusCode()));
                 if (response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES) {
                     byte[] content = EntityUtils.toByteArray(response.getEntity());
-                    res = new String(content, "UTF-8");
+                    if (content.length > MIN_COMPRESSED_STRING_LENGTH) {
+                        Inflater decompresser = new Inflater();
+                        decompresser.setInput(content);
+
+                        ByteArrayOutputStream outputStream = new ByteArrayOutputStream(content.length);
+                        byte[] result = new byte[1024];
+                        while (!decompresser.finished()) {
+                            int count = decompresser.inflate(result);
+                            outputStream.write(result, 0, count);
+                        }
+                        outputStream.close();
+                        byte[] output = outputStream.toByteArray();
+                        decompresser.end();
+
+                        Log.d(TAG, "Byte array has been decompressed!");
+                        Log.d(TAG, "Size of original got array: " + content.length);
+                        Log.d(TAG, "Size of uncompresed array is: " + output.length);
+                        comCont.content = new String(output, 0, output.length, "UTF-8");
+                        comCont.compressed = content.length;
+                        comCont.uncompressed = output.length;
+                    }
+                    else {
+                        comCont.content = new String(content, "UTF-8");
+                        comCont.compressed = content.length;
+                        comCont.uncompressed = content.length;
+                    }
+                    //res = new String(result, 0, content.length, "UTF-8");
                 }
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-        return res;
+        return comCont;
     }
 
     @Override
@@ -301,21 +334,73 @@ public class  ServerAdapter implements SereverRequests{
     }
 
     public void sendMessage(int chatId, String message) {
-        HttpClient httpClient = new DefaultHttpClient();
-        HttpPost p = new HttpPost(Config.SEND_MESSAGE + String.valueOf(chatId));
-        InputStream stream = new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8));
-        try {
-            p.setEntity(new InputStreamEntity(stream, message.length()));
-            p.addHeader("Authorization", Config.TOKEN);
-            p.addHeader("Content-Type", "application/octet-stream");
-            StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-            StrictMode.setThreadPolicy(policy);
-            HttpResponse response = httpClient.execute(p);
-            if (!(response != null || response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES)){
-                Log.i(TAG, "Message not sent");
+        /* Encode messege */
+        if (message.length() > MIN_COMPRESSED_STRING_LENGTH) {
+            byte[] getByte = message.getBytes();
+
+            Deflater compresser = new Deflater();
+            compresser.setLevel(Deflater.BEST_COMPRESSION);
+            compresser.setInput(getByte);
+
+            ByteArrayOutputStream bos = new ByteArrayOutputStream(getByte.length);
+
+            compresser.finish();
+
+            byte[] buffer = new byte[1024];
+
+            while (!compresser.finished()) {
+                int bytesCompressed = compresser.deflate(buffer);
+                bos.write(buffer, 0, bytesCompressed);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
+            try {
+                bos.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            byte[] compressedArray = bos.toByteArray();
+            compresser.end();
+            Log.d(TAG, "Byte array has been compressed!");
+            Log.d(TAG, "Size of original array is:" + getByte.length); //from this take values for Munir
+            Log.d(TAG, "Size of compressed array is:" + compressedArray.length);
+
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpPost p = new HttpPost(Config.SEND_MESSAGE + String.valueOf(chatId));
+           // InputStream stream = new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8));
+            try {
+                // p.setEntity(new InputStreamEntity(stream, message.length()));
+                p.setEntity(new ByteArrayEntity(compressedArray));
+                p.addHeader("Authorization", Config.TOKEN);
+                p.addHeader("Content-Type", "application/octet-stream");
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+                HttpResponse response = httpClient.execute(p);
+                if (!(response != null || response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES)) {
+                    Log.i(TAG, "Message not sent");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        } else {
+            Log.d(TAG, "Byte array has been compressed!");
+            Log.d(TAG, "Size of original array is:" + message.length()); //from this take values for Munir
+            Log.d(TAG, "Size of compressed array is:" + message.length());
+            HttpClient httpClient = new DefaultHttpClient();
+            HttpPost p = new HttpPost(Config.SEND_MESSAGE + String.valueOf(chatId));
+            InputStream stream = new ByteArrayInputStream(message.getBytes(StandardCharsets.UTF_8));
+            try {
+                p.setEntity(new InputStreamEntity(stream, message.length()));
+                //p.setEntity(new ByteArrayEntity(compressedArray));
+                p.addHeader("Authorization", Config.TOKEN);
+                p.addHeader("Content-Type", "application/octet-stream");
+                StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+                StrictMode.setThreadPolicy(policy);
+                HttpResponse response = httpClient.execute(p);
+                if (!(response != null || response.getStatusLine().getStatusCode() == Config.LOGIN_SUCCES)) {
+                    Log.i(TAG, "Message not sent");
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         }
     }
 
