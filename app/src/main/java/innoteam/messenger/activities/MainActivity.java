@@ -8,18 +8,17 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.ToxicBakery.viewpager.transforms.DepthPageTransformer;
 
-import innoteam.messenger.DataProvider;
 import innoteam.messenger.R;
 import innoteam.messenger.adapters.MyPagerAdapter;
 import innoteam.messenger.configs.Config;
 import innoteam.messenger.fragments.ChatsFragment;
 import innoteam.messenger.fragments.MessagesFragment;
-import innoteam.messenger.interfaces.OnChatSelectedListener;
+import innoteam.messenger.interfaces.MainActivityInterconnectionListener;
 import innoteam.messenger.network.NetworkHelper;
 
-public class MainActivity extends AppCompatActivity implements OnChatSelectedListener{
+public class MainActivity extends AppCompatActivity implements MainActivityInterconnectionListener {
     private static final int REQUEST_SIGNUP = 200;
-    boolean IS_LOGED = false;
+    boolean IS_LOGGED = false;
     MyPagerAdapter adapter;
     MessagesFragment messagesFragment;
     ChatsFragment chatsFragment;
@@ -56,8 +55,6 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
                 networkHelper.tokenRefresher(this);
             }
         }
-
-        DataProvider.getInstance().initDataset();
     }
 
     @Override
@@ -74,20 +71,13 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
                 networkHelper.tokenRefresher(this);
             }
         }
-
-        DataProvider.getInstance().initDataset();
         super.onResume();
     }
 
     @Override
-    public void onChatSelected(int chatId) {
-        messagesFragment.setChat(chatId);
+    public void onChatSelected() {
         viewPager.setCurrentItem(1, true);
-
-        // Switch viewPager to messages fragment
-
     }
-
 
     @Override
     public void onLogOut() {
@@ -98,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements OnChatSelectedLis
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == REQUEST_SIGNUP) {
-            IS_LOGED = true;
+            IS_LOGGED = true;
             onResume();
         }
     }

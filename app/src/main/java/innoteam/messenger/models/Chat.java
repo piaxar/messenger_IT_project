@@ -15,6 +15,8 @@ public class Chat {
     private int chatId;
     private String chatName;
     private int lastMessageId;
+    private int updates;
+
     public boolean isDataUpdated;
     public boolean updateFound = false;
 
@@ -84,17 +86,25 @@ public class Chat {
        if (!isDataUpdated){
            messagesIds.clear();
            messagesIds.addAll(ServerAdapter.INSTANCE.getChatMessagesIdsById(chatId));
+           updates = 0;
            if(messagesIds.size() == messages.size()){
                isDataUpdated = true;
            } else {
                for (int i = messages.size(); i < messagesIds.size(); i++){
                    messages.add(getMessageById(messagesIds.get(i)));
+                   updates++;
                }
                lastMessageId = messagesIds.get(messagesIds.size()-1);
            }
            isDataUpdated = true;
            updateFound = false;
        }
+    }
+
+    public int getUpdatedCount(){
+        int value = updates;
+        updates = 0;
+        return  value;
     }
 
     public void checkForUpdates(){
