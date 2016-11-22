@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -73,8 +74,12 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         calendar.setTime(message.getSendTime());
         String currTime = String.format("%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(calendar.MINUTE));
         tvMessageTime.setText(currTime);
+        long a = message.getUncompressedLength();
+        long b = message.getCompressedLength();
+        float rate =(float) b/a * 100;
 
-        tvStat.setText("Size in bytes: "+ message.getUncompressedLength()+". Compressed size: "+message.getCompressedLength()+".");
+        tvStat.setText("Size in bytes: "+ message.getUncompressedLength()+
+                ". Compressed size: "+message.getCompressedLength()+". Total: "+new DecimalFormat("##.##").format(rate)+"% of original message.");
 
         Log.d(TAG, "Element " + position + " set.");
     }

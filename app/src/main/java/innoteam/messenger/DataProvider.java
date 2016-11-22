@@ -31,6 +31,8 @@ public class DataProvider implements SwipeRefreshLayout.OnRefreshListener, View.
     private static final String TAG = "DataProvider";
     private static DataProvider INSTANCE = null;
 
+    private Boolean update = false;
+
     private ArrayList<Chat> chats;
     private ArrayList<Message> messages;
     private int selectedChatPosition;
@@ -83,30 +85,26 @@ public class DataProvider implements SwipeRefreshLayout.OnRefreshListener, View.
 
         rvMessages.setAdapter(msgAdapter);
 
-
         final Handler h = new Handler();
-        final int delay = 1000;
+        final int delay = 500;
         h.postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (chatAvailable) {
                     Log.d(TAG, "post delayed");
-                    chats.get(selectedChatPosition).checkForUpdates();
-                    if (chats.get(selectedChatPosition).updateFound) {
                         ConstantUpdater mt = new ConstantUpdater();
                         mt.execute();
-                    }
                 }
                 h.postDelayed(this, delay);
             }
         }, delay);
-
     }
 
     public static synchronized DataProvider getInstance() {
         if(INSTANCE == null)
         {
             INSTANCE = new DataProvider();
+
         }
         return INSTANCE;
     }
@@ -118,6 +116,9 @@ public class DataProvider implements SwipeRefreshLayout.OnRefreshListener, View.
 
     private DataProvider(){
         chats = new ArrayList<>();
+
+
+
     }
 
     public void createNewChat(String s) {
@@ -247,17 +248,12 @@ public class DataProvider implements SwipeRefreshLayout.OnRefreshListener, View.
         @Override
         protected Void doInBackground(String... params) {
             ServerAdapter.INSTANCE.sendMessage(chats.get(selectedChatPosition).getChatId(), params[0]);
-            chats.get(selectedChatPosition).checkForUpdates();
-            messages.clear();
-            messages.addAll(chats.get(selectedChatPosition).getAllMessages());
             return null;
         }
 
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            msgAdapter.notifyItemInserted(msgAdapter.getItemCount() - 1);
-            rvMessages.scrollToPosition(msgAdapter.getItemCount() - 1);
             etMessageContent.setText("");
         }
     }
@@ -270,7 +266,33 @@ public class DataProvider implements SwipeRefreshLayout.OnRefreshListener, View.
 
         @Override
         protected Void doInBackground(Void... params) {
-            chats.get(selectedChatPosition).updateData();
+            chats.get(selectedChatPosition).checkForUpdates();
+            if (chats.get(selectedChatPosition).updateFound) {
+                chats.get(selectedChatPosition).updateData();
+                messages.clear();
+                messages.addAll(chats.get(selectedChatPosition).getAllMessages());
+                update = true;
+
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            super.onPostExecute(aVoid);
+            if (update){
+                msgAdapter.notifyDataSetChanged();
+                rvMessages.scrollToPosition(msgAdapter.getItemCount() - 1);
+                update = false;
+            }
+
+        }
+    }
+
+    private class UpdaterFromSocket extends AsyncTask<Void, Void, Void>{
+        @Override
+        protected Void doInBackground(Void... params) {
+            chats.get(selectedChatPosition).checkForUpdates();
             messages.clear();
             messages.addAll(chats.get(selectedChatPosition).getAllMessages());
             return null;
@@ -279,10 +301,8 @@ public class DataProvider implements SwipeRefreshLayout.OnRefreshListener, View.
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            for (int i = 0; i < chats.get(selectedChatPosition).getUpdatedCount(); i++){
-                msgAdapter.notifyItemInserted(msgAdapter.getItemCount() - 1);
-                rvMessages.scrollToPosition(msgAdapter.getItemCount() - 1);
-            }
+            msgAdapter.notifyItemInserted(msgAdapter.getItemCount() - 1);
+            rvMessages.scrollToPosition(msgAdapter.getItemCount() - 1);
         }
     }
 }
