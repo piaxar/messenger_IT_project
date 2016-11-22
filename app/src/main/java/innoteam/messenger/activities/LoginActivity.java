@@ -107,26 +107,6 @@ public class LoginActivity extends AppCompatActivity {
     }
 
 
-    /*@Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == REQUEST_SIGNUP) {
-            if (resultCode == RESULT_OK) {
-
-                // TODO: Implement successful signup logic here
-                // By default we just finish the Activity and log them in automatically
-                this.finish();
-            }
-        }
-    }*/
-    /*
-    @Override
-    public void onBackPressed() {
-        // Disable going back to the MainActivity
-        moveTaskToBack(true);
-    }
-*/
-
-
     public void onLoginSuccess(final String login, final String password) {
         _loginButton.setEnabled(true);
         String hashPassword = new String(Hex.encodeHex(DigestUtils.md5(password)));

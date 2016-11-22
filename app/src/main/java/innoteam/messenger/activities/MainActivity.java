@@ -43,6 +43,8 @@ public class MainActivity extends AppCompatActivity implements MainActivityInter
         viewPager.setPageTransformer(true, new DepthPageTransformer());
 
 
+
+
         if (sharedPreferences.contains(Config.TOKEN_SHARED_PREF) == false) {
             Intent intent = new Intent(this, LoginActivity.class);
             startActivity(intent);

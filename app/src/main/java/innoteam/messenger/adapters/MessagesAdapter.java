@@ -73,8 +73,11 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         calendar.setTime(message.getSendTime());
         String currTime = String.format("%02d:%02d", calendar.get(Calendar.HOUR_OF_DAY), calendar.get(calendar.MINUTE));
         tvMessageTime.setText(currTime);
-
-        tvStat.setText("Size in bytes: "+ message.getUncompressedLength()+". Compressed size: "+message.getCompressedLength()+".");
+        long a = message.getUncompressedLength();
+        long b = message.getCompressedLength();
+        float rate = (float) a/b;
+        tvStat.setText("Size in bytes: "+ message.getUncompressedLength()+
+                ". Compressed size: "+message.getCompressedLength()+". Compression rate: "+rate);
 
         Log.d(TAG, "Element " + position + " set.");
     }
