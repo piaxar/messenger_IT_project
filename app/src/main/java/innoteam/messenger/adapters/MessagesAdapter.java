@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
@@ -75,9 +76,10 @@ public class MessagesAdapter extends RecyclerView.Adapter<MessagesAdapter.ViewHo
         tvMessageTime.setText(currTime);
         long a = message.getUncompressedLength();
         long b = message.getCompressedLength();
-        float rate = (float) a/b;
+        float rate =(float) b/a * 100;
+
         tvStat.setText("Size in bytes: "+ message.getUncompressedLength()+
-                ". Compressed size: "+message.getCompressedLength()+". Compression rate: "+rate);
+                ". Compressed size: "+message.getCompressedLength()+". Total: "+new DecimalFormat("##.##").format(rate)+"% of original message.");
 
         Log.d(TAG, "Element " + position + " set.");
     }

@@ -17,6 +17,7 @@ import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -290,7 +291,7 @@ public class  ServerAdapter implements SereverRequests{
                     } else {
                         byte[] compressedMessage = Arrays.copyOfRange(content, 1, content.length);
                         comCont.content = new String(compressedMessage, "UTF-8");
-                        comCont.compressed = compressedMessage.length;
+                        comCont.compressed = compressedMessage.length + 1;
                         comCont.uncompressed = compressedMessage.length;
                     }
                 }
@@ -333,7 +334,12 @@ public class  ServerAdapter implements SereverRequests{
     public void sendMessage(int chatId, String message) {
         /* Encode messege */
 
-        byte[] getByte = message.getBytes();
+        byte[] getByte = new byte[0];
+        try {
+            getByte = message.getBytes("UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         Deflater compresser = new Deflater();
         compresser.setLevel(Deflater.BEST_COMPRESSION);
         compresser.setInput(getByte);
